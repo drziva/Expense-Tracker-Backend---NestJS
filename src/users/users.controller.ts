@@ -9,9 +9,12 @@ export class UsersController {
   getUsers() {
     return this.usersService.findAll();
   }
-
-  @Post()
+  /*
+  Moving this API to AuthModule for better structure
+  
+  @Post('create')
   addUser(@Body() body: { username: string; password: string; email: string }) {
     return this.usersService.createUser(body.username, body.password, body.email);
   }
+  */
 }

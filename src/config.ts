@@ -4,6 +4,6 @@ export default () => ({
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3306,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    name: process.env.DB_NAME,
+    name: process.env.DB_NAME
   },
 });
