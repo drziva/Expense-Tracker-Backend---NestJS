@@ -1,20 +1,27 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-
+import config from './config';
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), 
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: true,
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      load: [config], 
+    }), 
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type:"mysql",
+        host:configService.get<string>('database.host'),
+        port:configService.get<number>('database.port'),
+        username:configService.get<string>('database.username'),
+        password:configService.get<string>('database.password'),
+        database:configService.get<string>('database.name'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      
     }),
     UsersModule,
   ],
