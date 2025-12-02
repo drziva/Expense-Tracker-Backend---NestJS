@@ -7,23 +7,23 @@ import config from './config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
-      load: [config], 
-    }), 
+      envFilePath: '.env',
+      load: [config],
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: "mysql",
+        type: 'mysql',
         host: configService.get<string>('database.host'),
         port: configService.get<number>('database.port'),
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
-        database: configService.get<string>('database.name'),
+        database: configService.get<string>('database.database'),
         autoLoadEntities: true,
         synchronize: true,
       }),
-      
     }),
     UsersModule,
     AuthModule,

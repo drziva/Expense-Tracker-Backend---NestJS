@@ -11,6 +11,17 @@ export class UsersService {
     private userRepo: Repository<User>,
   ) {}
 
+  async findByEmail(email: string) {
+    return this.userRepo.findOne({ where: { email } });
+  }
+
+  async existsByUsernameOrEmail(username: string, email: string): Promise<boolean> {
+    const count = await this.userRepo.count({
+      where: [{ username }, { email }],
+    });
+    return count > 0;
+  }
+
   async findAll() {
     return this.userRepo.find();
   }
