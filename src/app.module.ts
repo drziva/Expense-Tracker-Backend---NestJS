@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import config from './config';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ 
@@ -12,7 +13,7 @@ import config from './config';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type:"mysql",
+        type: "mysql",
         host:configService.get<string>('database.host'),
         port:configService.get<number>('database.port'),
         username:configService.get<string>('database.username'),
