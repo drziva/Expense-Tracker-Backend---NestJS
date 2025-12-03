@@ -13,7 +13,7 @@ export class AuthService {
         private jwtService: JwtService,
     ) {}
 
-    async signUp(signUpDto: SignUpDto): Promise<SignUpResponse> {
+    async signUp(signUpDto: SignUpDto): Promise<LoginResponse> {
         const exists = await this.usersService.existsByUsernameOrEmail(signUpDto.username,signUpDto.email);
 
         if(exists){
@@ -22,11 +22,14 @@ export class AuthService {
 
         const user = await this.usersService.createUser(
             signUpDto.username,
+            signUpDto.password,
             signUpDto.email,
-            signUpDto.password
         );
-        const response: SignUpResponse = { id: user.id, username: user.username, email: user.email };
-        return response;
+        //const response: SignUpResponse = { id: user.id, username: user.username, email: user.email };
+        
+        const loginInfo: LoginDto = { email: signUpDto.email, password: signUpDto.password };
+
+        return this.login(loginInfo);
     }
 
     async login(loginDto: LoginDto): Promise<LoginResponse>{

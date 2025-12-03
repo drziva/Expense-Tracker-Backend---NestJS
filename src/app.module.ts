@@ -9,7 +9,6 @@ import config from './config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
       load: [config],
     }),
     TypeOrmModule.forRootAsync({
