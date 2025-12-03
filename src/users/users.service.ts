@@ -11,28 +11,31 @@ export class UsersService {
     private userRepo: Repository<User>,
   ) {}
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string) : Promise<User | null> {
     return this.userRepo.findOne({ where: { email } });
   }
 
   async existsByUsernameOrEmail(username: string, email: string): Promise<boolean> {
-    const count = await this.userRepo.count({
-      where: [{ username }, { email }],
+
+    const exists = await this.userRepo.exists({
+      where: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }],
     });
-    return count > 0;
+
+    return exists;
+
   }
 
-  async findAll() {
+  async findAll() : Promise<User[]> {
     return this.userRepo.find();
   }
 
-  async createUser(username: string, password: string, email: string) {
+  async createUser(username: string, password: string, email: string) : Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     const user = this.userRepo.create({ 
-      username, 
-      password: hashedPassword, 
-      email 
+      username: username.toLowerCase(), 
+      email: email.toLowerCase(), 
+      password: hashedPassword
     });
 
     return this.userRepo.save(user);

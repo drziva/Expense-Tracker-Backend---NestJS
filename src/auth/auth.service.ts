@@ -2,6 +2,9 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { SignUpDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
+import { LoginResponse, SignUpResponse } from './auth.types';
 
 @Injectable()
 export class AuthService {
@@ -10,23 +13,24 @@ export class AuthService {
         private jwtService: JwtService,
     ) {}
 
-    async signUp(input: { username: string; password: string; email: string;}) {
-        const exists = await this.usersService.existsByUsernameOrEmail(input.username,input.email);
+    async signUp(signUpDto: SignUpDto) : Promise<SignUpResponse> {
+        const exists = await this.usersService.existsByUsernameOrEmail(signUpDto.username,signUpDto.email);
 
         if(exists){
             throw new ConflictException('User already exists');
         }
 
         const user = await this.usersService.createUser(
-            input.username,
-            input.password,
-            input.email
+            signUpDto.username,
+            signUpDto.email,
+            signUpDto.password
         );
-        return { id: user.id, username: user.username, email: user.email };
+        const response : SignUpResponse = { id: user.id, username: user.username, email: user.email };
+        return response;
     }
 
-    async login(input:{email: string;password:string}){
-        const { email, password } = input;
+    async login(loginDto: LoginDto) : Promise<LoginResponse>{
+        const { email, password } = loginDto;
 
         const user = await this.usersService.findByEmail(email);
         if(!user){
@@ -45,15 +49,17 @@ export class AuthService {
         }
         
         const token = this.jwtService.sign(payload);
-
-        return { 
-            access_token:token,
-            user:{
-                id:user.id,
-                username:user.username,
-                email:user.email
+        
+        const response: LoginResponse = {
+            access_token: token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
             }
-         };
+        }
+
+        return response
     }
 }
 
