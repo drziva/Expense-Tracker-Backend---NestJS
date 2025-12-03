@@ -13,11 +13,11 @@ export class AuthService {
         private jwtService: JwtService,
     ) {}
 
-    async signUp(signUpDto: SignUpDto) : Promise<SignUpResponse> {
+    async signUp(signUpDto: SignUpDto): Promise<SignUpResponse> {
         const exists = await this.usersService.existsByUsernameOrEmail(signUpDto.username,signUpDto.email);
 
         if(exists){
-            throw new ConflictException('User already exists');
+            throw new ConflictException('User with this email or username already exists.');
         }
 
         const user = await this.usersService.createUser(
@@ -25,11 +25,11 @@ export class AuthService {
             signUpDto.email,
             signUpDto.password
         );
-        const response : SignUpResponse = { id: user.id, username: user.username, email: user.email };
+        const response: SignUpResponse = { id: user.id, username: user.username, email: user.email };
         return response;
     }
 
-    async login(loginDto: LoginDto) : Promise<LoginResponse>{
+    async login(loginDto: LoginDto): Promise<LoginResponse>{
         const { email, password } = loginDto;
 
         const user = await this.usersService.findByEmail(email);
@@ -43,9 +43,9 @@ export class AuthService {
         }
         
         const payload = {
-                sub:user.id,
-                username:user.username,
-                email:user.email
+                sub: user.id,
+                username: user.username,
+                email: user.email
         }
         
         const token = this.jwtService.sign(payload);
