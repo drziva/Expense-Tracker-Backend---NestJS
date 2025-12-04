@@ -25,11 +25,16 @@ export class AuthService {
             signUpDto.password,
             signUpDto.email,
         );
-        //const response: SignUpResponse = { id: user.id, username: user.username, email: user.email };
+        
+        const token = this.jwtService.signAsync({
+            sub: user.id,
+            username: user.username,
+            email: user.email
+        });
 
-        const loginInfo: LoginDto = { email: signUpDto.email, password: signUpDto.password };
+        const response: LoginResponse = { access_token: await token, user };
 
-        return this.login(loginInfo);
+        return response;
     }
 
     async login(loginDto: LoginDto): Promise<LoginResponse>{
