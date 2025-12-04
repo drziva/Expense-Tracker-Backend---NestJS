@@ -26,13 +26,20 @@ export class AuthService {
             signUpDto.email,
         );
         
-        const token = this.jwtService.signAsync({
+        const token = await this.jwtService.signAsync({
             sub: user.id,
             username: user.username,
             email: user.email
         });
 
-        const response: LoginResponse = { access_token: await token, user };
+        const response: LoginResponse = {
+            access_token: token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            }
+        }
 
         return response;
     }
@@ -70,4 +77,3 @@ export class AuthService {
         return response
     }
 }
-
