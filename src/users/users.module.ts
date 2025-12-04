@@ -7,7 +7,10 @@ import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
-  imports: [ConfigModule,TypeOrmModule.forFeature([User])],
+  imports: [
+    ConfigModule,
+    TypeOrmModule.forFeature([User])
+  ],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],
