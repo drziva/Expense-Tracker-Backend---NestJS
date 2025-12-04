@@ -4,6 +4,7 @@ import { Expense } from './expenses.entity';
 import { Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UsersService } from 'src/users/users.service';
+import { UpdateExpenseDto } from './dto/update-expense.dto';
 
 @Injectable()
 export class ExpensesService {
@@ -13,6 +14,7 @@ export class ExpensesService {
         private usersService: UsersService,
     ){}
 
+    
     async create(dto: CreateExpenseDto, userId: number): Promise<Expense> {
         const user = await this.usersService.findById(userId);
 
@@ -26,7 +28,24 @@ export class ExpensesService {
             user: user,
         });
         return await this.expenseRepo.save(expense);
+    }
+
+    async getAllExpenses(userId: number){
+        return await this.expenseRepo.find({
+            where: {user_id: userId }
+        })
+    }
+
+    async deleteExpenseById(id: number, userId: number): Promise<boolean> {
+        const result = await this.expenseRepo.delete({ id, user_id: userId});
         
+        return(result.affected ?? 0) > 0;
+    }
+
+    async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<boolean>{
+        const result = await this.expenseRepo.update({ id, user_id: userId }, dto);
+        
+        return (result.affected ?? 0) > 0;
     }
 
 }

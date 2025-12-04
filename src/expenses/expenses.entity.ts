@@ -12,6 +12,9 @@ export class Expense {
   @Column({ type: "decimal", precision: 10, scale: 2 })
   amount: number;
 
+  @Column()
+  user_id:number
+
   @ManyToOne(() => User, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user: User;
