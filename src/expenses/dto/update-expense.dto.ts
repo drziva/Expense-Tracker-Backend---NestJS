@@ -12,5 +12,4 @@ export class UpdateExpenseDto {
   @IsNumber()
   @IsNotEmpty()
   amount?: number;
-
 }

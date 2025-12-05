@@ -1,18 +1,32 @@
-import { Controller,Post, Body, Get, Delete, Param, Put } from "@nestjs/common";
+import { Controller,Post, Body, Get, Delete, Param, Put, Query} from "@nestjs/common";
 import { CreateExpenseDto } from "./dto/create-expense.dto";
 import { ExpensesService } from "./expenses.service";
 import { ExpenseResponse } from "./expense.types";
 import { UserId } from "src/auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { Expense } from "./expenses.entity";
+import { ParseDatePipe } from "src/common/pipes/parse-date.pipe";
 
 @Controller("expenses")
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
-  @Get('all')
-  async getExpenses(@UserId() userId: number): Promise<Expense[]> {
-    return this.expensesService.getAllExpenses(userId);
+  @Get("all")
+  async getFiltered(
+    @UserId() userId: number,
+    @Query("from", ParseDatePipe) from?: Date,
+    @Query("to", ParseDatePipe) to?: Date): Promise<Expense[]> {
+    return this.expensesService.getFilteredExpenses(userId, from, to);
+  }
+
+  @Get("total")
+  async getTotalExpenses(@UserId() userId: number): Promise<number> {
+    return this.expensesService.getTotalExpensesValue(userId);
+  }
+
+  @Get(":id")
+  async getExpenseById(@Param('id') id: number, @UserId() userId: number): Promise<Expense> {
+    return this.expensesService.getExpenseById(id, userId);
   }
 
   @Post("add")
@@ -31,12 +45,16 @@ export class ExpensesController {
   async modifyExpense(
     @Param("id",) id: number,
     @UserId() userId: number,
-    @Body() updateExpenseDto: UpdateExpenseDto): Promise<boolean> {
-      return await this.expensesService.updateExpenseById(+id,userId, updateExpenseDto);
+    @Body() updateExpenseDto: UpdateExpenseDto): Promise<string> {
+      const res = await this.expensesService.updateExpenseById(+id,userId, updateExpenseDto);
+
+    return res ? `Expense with id ${id} updated successfully` : `Expense with id ${id} not found`;
   }
 
   @Delete(":id")
-  async deleteExpense(@Param("id") id: number, @UserId() userId: number): Promise<boolean> {
-    return await this.expensesService.deleteExpenseById(+id,userId);
+  async deleteExpense(@Param("id") id: number, @UserId() userId: number): Promise<string> {
+    const res = await this.expensesService.deleteExpenseById(+id,userId);
+
+    return res ? `Expense with id:${id} deleted successfully` : `Expense with id:${id} not found`;
   }
 }
