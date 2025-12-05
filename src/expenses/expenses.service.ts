@@ -39,7 +39,7 @@ export class ExpensesService {
         })
     }
 
-    async getFilteredExpenses(userId: number, from?: Date, to?: Date){
+    async getFilteredExpenses(userId: number, from?: Date, to?: Date, minRaw?: string, maxRaw?: string): Promise<Expense[]> {
         const where: any = { user_id: userId};
         if (from && to) {
             where.created_at = Between(from, to);
@@ -47,6 +47,17 @@ export class ExpensesService {
             where.created_at = MoreThanOrEqual(from);
         } else if (to) {
             where.created_at = LessThanOrEqual(to);
+        }
+
+        const min = minRaw ? Number(minRaw) : undefined;
+        const max = maxRaw ? Number(maxRaw) : undefined;
+        
+        if (min !== undefined && max !== undefined) {
+            where.amount = Between(min, max);
+        } else if (min !== undefined) {
+            where.amount = MoreThanOrEqual(min);
+        } else if (max !== undefined) {
+            where.amount = LessThanOrEqual(max);
         }
         return await this.expenseRepo.find({ where });
     }

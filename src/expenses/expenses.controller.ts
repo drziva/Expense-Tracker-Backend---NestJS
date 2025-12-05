@@ -1,4 +1,4 @@
-import { Controller,Post, Body, Get, Delete, Param, Put, Query} from "@nestjs/common";
+import { Controller,Post, Body, Get, Delete, Param, Put, Query, ParseFloatPipe} from "@nestjs/common";
 import { CreateExpenseDto } from "./dto/create-expense.dto";
 import { ExpensesService } from "./expenses.service";
 import { ExpenseResponse } from "./expense.types";
@@ -11,12 +11,14 @@ import { ParseDatePipe } from "src/common/pipes/parse-date.pipe";
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
-  @Get("all")
+  @Get()
   async getFiltered(
     @UserId() userId: number,
     @Query("from", ParseDatePipe) from?: Date,
-    @Query("to", ParseDatePipe) to?: Date): Promise<Expense[]> {
-    return this.expensesService.getFilteredExpenses(userId, from, to);
+    @Query("to", ParseDatePipe) to?: Date,
+    @Query("min") min?: string,
+    @Query("max") max?: string): Promise<Expense[]> {
+    return this.expensesService.getFilteredExpenses(userId, from, to, min, max);
   }
 
   @Get("total")
@@ -26,7 +28,7 @@ export class ExpensesController {
 
   @Get(":id")
   async getExpenseById(@Param('id') id: number, @UserId() userId: number): Promise<Expense> {
-    return this.expensesService.getExpenseById(id, userId);
+    return this.expensesService.getExpenseById(+id, userId);
   }
 
   @Post("add")
