@@ -10,7 +10,7 @@ export class UpdateExpenseDto {
   description?: string;
 
   @ApiPropertyOptional({ example: 150.75, description: 'The amount of the expense' })
-  @ValidateIf(o=>!o.description)
+  @ValidateIf(o => !o.description)
   @IsOptional()
   @IsNumber()
   @IsNotEmpty()

@@ -15,11 +15,11 @@ export type ExpenseResponse = {
 
 export type UpdateExpenseResponse = {
     success: boolean;
-    id: number;
+    expense: ExpenseResponse;
 }
 
 export type GetExpenseResponse = {
-    data: Expense[],
+    data: ExpenseResponse[],
     page: number,
     limit: number,
     totalItems: number,
@@ -34,4 +34,5 @@ export interface ExpenseQueryOptions {
     sort?: ExpenseSort;
     page?: number;
     limit?: number;
+    search?: string;
 }

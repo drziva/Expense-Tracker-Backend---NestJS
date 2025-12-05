@@ -1,12 +1,11 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './expenses.entity';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UsersService } from 'src/users/users.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { ExpenseSort } from './expense-sort.type';
-import { DeleteExpenseResponse, ExpenseQueryOptions, GetExpenseResponse, UpdateExpenseResponse } from './expenses.types';
+import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse, UpdateExpenseResponse } from './expenses.types';
 
 @Injectable()
 export class ExpensesService {
@@ -16,7 +15,7 @@ export class ExpensesService {
         private usersService: UsersService,
     ){}
     
-    async create(dto: CreateExpenseDto, userId: number): Promise<Expense> {
+    async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {  // Implement DTO for response
         const user = await this.usersService.findById(userId);
 
         if (!user) {
@@ -28,22 +27,17 @@ export class ExpensesService {
                 description: dto.description,
                 user: user,
             });
-            return await this.expenseRepo.save(expense);
+            const savedExpense = await this.expenseRepo.save(expense);
+            return this.toExpenseResponse(savedExpense);
         } catch (error) {
             console.error("Error creating expense:", error);
             throw new InternalServerErrorException("Failed to create expense");
         }
     }
 
-    async getAllExpenses(userId: number){
-        return await this.expenseRepo.find({
-            where: {user_id: userId }
-        })
-    }
-
     async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};
-        const { from, to, min, max, sort, page = 1, limit = 20 } = options;
+        const { from, to, min, max, sort, page = 1, limit = 20, search } = options;
         //Filtering
         if (from && to) {
             where.created_at = Between(from, to);
@@ -59,6 +53,9 @@ export class ExpensesService {
             where.amount = MoreThanOrEqual(min);
         } else if (max !== undefined) {
             where.amount = LessThanOrEqual(max);
+        }
+        if (search) {
+            where.description =  Like(`%${search}%`);
         }
         //Sorting
         let order: any = { created_at: 'DESC' }; // Default order
@@ -79,10 +76,10 @@ export class ExpensesService {
         }
         //Pagination
         const skip = (page - 1) * limit;
-        const [data, total] = await this.expenseRepo.findAndCount({ where, order, skip, take: limit });
+        const [data, total] = await this.expenseRepo.findAndCount({ where, order, skip, take: limit});
 
         return {
-            data,
+            data: data.map( exp=> this.toExpenseResponse(exp) ),
             page,
             limit,
             totalItems: total,
@@ -91,12 +88,16 @@ export class ExpensesService {
 
     }
 
-    async getExpenseById(id: number, userId: number): Promise<Expense> {
+    async getExpenseById(id: number, userId: number): Promise<ExpenseResponse> {
         const expense = await this.expenseRepo.findOne({ where: { id, user_id: userId },});
         if (!expense) {
             throw new NotFoundException("Expense not found");
             }
-        return expense;
+        return this.toExpenseResponse(expense);
+    }
+
+    async getCustomReport(userId: number, from?: Date, to?: Date) {
+        return { message: "Report generation not yet implemented." };
     }
 
     async getTotalExpensesValue(userId: number): Promise<number> {
@@ -104,25 +105,49 @@ export class ExpensesService {
         return expenses.reduce((total, expense) => total + Number(expense.amount ?? 0), 0);
     }
 
-    async deleteExpenseById(id: number, userId: number): Promise<DeleteExpenseResponse> {
-        try {
-            const result = await this.expenseRepo.delete({ id, user_id: userId});
-            
-            return{success:(result.affected ?? 0) > 0 , id:id};
-        } catch (error) {
-            console.error("Error deleting expense:", error);
-            throw new InternalServerErrorException("Failed to delete expense");
-        }
-    }
+async deleteExpenseById(id: number, userId: number): Promise<DeleteExpenseResponse> {
+    try {
+        const result = await this.expenseRepo.delete({ id, user_id: userId });
+
+        return {
+            success: (result.affected ?? 0) > 0,
+            id
+        };
+    } catch (error) {
+        console.error("Error deleting expense:", error);
+        throw new InternalServerErrorException("Failed to delete expense");
+  }
+}
+
 
     async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<UpdateExpenseResponse> {
         try {
             const result = await this.expenseRepo.update({ id, user_id: userId }, dto);
+            if(!result.affected){
+                throw new NotFoundException("Expense not found");
+            }
+            const updatedExpense = await this.expenseRepo.findOne({ where: { id, user_id: userId } });
 
-            return { success: (result.affected ?? 0) > 0, id: id };
+            return { success: true, expense: this.toExpenseResponse(updatedExpense!) };
         } catch (error) {
             console.error("Error updating expense:", error);
             throw new InternalServerErrorException("Failed to update expense");
         }
     }
+
+     private async getAllExpenses(userId: number){
+        return await this.expenseRepo.find({
+            where: {user_id: userId }
+        })
+    }
+
+    private toExpenseResponse(expense: Expense): ExpenseResponse {
+    return {
+        id: expense.id,
+        amount: Number(expense.amount),
+        description: expense.description,
+        createdAt: expense.created_at,
+    };
+    }
+
 }
