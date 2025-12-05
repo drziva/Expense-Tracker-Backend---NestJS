@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './expenses.entity';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
@@ -15,7 +15,7 @@ export class ExpensesService {
         private usersService: UsersService,
     ){}
     
-    async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {  // Implement DTO for response
+    async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
         const user = await this.usersService.findById(userId);
 
         if (!user) {
@@ -105,49 +105,60 @@ export class ExpensesService {
         return expenses.reduce((total, expense) => total + Number(expense.amount ?? 0), 0);
     }
 
-async deleteExpenseById(id: number, userId: number): Promise<DeleteExpenseResponse> {
-    try {
-        const result = await this.expenseRepo.delete({ id, user_id: userId });
+    async deleteExpenseById(id: number, userId: number): Promise<DeleteExpenseResponse> {
+        try {
+            const result = await this.expenseRepo.delete({ id, user_id: userId });
 
-        return {
-            success: (result.affected ?? 0) > 0,
-            id
-        };
-    } catch (error) {
-        console.error("Error deleting expense:", error);
-        throw new InternalServerErrorException("Failed to delete expense");
-  }
-}
-
+            return {
+                success: (result.affected ?? 0) > 0,
+                id
+            };
+        } catch (error) {
+            console.error("Error deleting expense:", error);
+            throw new InternalServerErrorException("Failed to delete expense");
+    }
+    }
 
     async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<UpdateExpenseResponse> {
-        try {
-            const result = await this.expenseRepo.update({ id, user_id: userId }, dto);
-            if(!result.affected){
-                throw new NotFoundException("Expense not found");
-            }
-            const updatedExpense = await this.expenseRepo.findOne({ where: { id, user_id: userId } });
+        const expense = await this.expenseRepo.findOne({ where: { id } });
+        if (!expense) {
+            throw new NotFoundException("Expense not found");
+        }
+        if (expense.user_id !== userId) {
+            throw new ForbiddenException("Unauthorized to update this expense");
+        }
+        const updatedEntity = await this.expenseRepo.preload({
+            id,
+            ...dto,
+        });
 
-            return { success: true, expense: this.toExpenseResponse(updatedExpense!) };
+        if (!updatedEntity) {
+            throw new NotFoundException("Expense not found");
+        }
+        try {
+        const saved = await this.expenseRepo.save(updatedEntity);
+        return {
+            success: true,
+            expense: this.toExpenseResponse(saved),
+        };
         } catch (error) {
             console.error("Error updating expense:", error);
             throw new InternalServerErrorException("Failed to update expense");
         }
     }
 
-     private async getAllExpenses(userId: number){
-        return await this.expenseRepo.find({
-            where: {user_id: userId }
-        })
+    private async getAllExpenses(userId: number): Promise<ExpenseResponse[]> {
+        const expenses = await this.expenseRepo.find({ where: { user_id: userId } });
+        return expenses.map(expense => this.toExpenseResponse(expense));
     }
 
     private toExpenseResponse(expense: Expense): ExpenseResponse {
-    return {
-        id: expense.id,
-        amount: Number(expense.amount),
-        description: expense.description,
-        createdAt: expense.created_at,
-    };
+        return {
+            id: expense.id,
+            amount: Number(expense.amount),
+            description: expense.description,
+            createdAt: expense.created_at,
+        };
     }
 
 }
