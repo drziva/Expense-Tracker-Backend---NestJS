@@ -1,10 +1,12 @@
-import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './expenses.entity';
 import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UsersService } from 'src/users/users.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { ExpenseSort } from './expense-sort.type';
+import { DeleteExpenseResponse, ExpenseQueryOptions, GetExpenseResponse, UpdateExpenseResponse } from './expenses.types';
 
 @Injectable()
 export class ExpensesService {
@@ -39,8 +41,10 @@ export class ExpensesService {
         })
     }
 
-    async getFilteredExpenses(userId: number, from?: Date, to?: Date, minRaw?: string, maxRaw?: string): Promise<Expense[]> {
+    async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};
+        const { from, to, min, max, sort, page = 1, limit = 20 } = options;
+        //Filtering
         if (from && to) {
             where.created_at = Between(from, to);
         } else if (from) {
@@ -49,9 +53,6 @@ export class ExpensesService {
             where.created_at = LessThanOrEqual(to);
         }
 
-        const min = minRaw ? Number(minRaw) : undefined;
-        const max = maxRaw ? Number(maxRaw) : undefined;
-        
         if (min !== undefined && max !== undefined) {
             where.amount = Between(min, max);
         } else if (min !== undefined) {
@@ -59,15 +60,42 @@ export class ExpensesService {
         } else if (max !== undefined) {
             where.amount = LessThanOrEqual(max);
         }
-        return await this.expenseRepo.find({ where });
+        //Sorting
+        let order: any = { created_at: 'DESC' }; // Default order
+        
+        switch(sort) {
+            case 'amount_asc':
+                order = { amount: 'ASC' };
+                break;
+            case 'amount_desc':
+                order = { amount: 'DESC' };
+                break;
+            case 'date_asc':
+                order = { created_at: 'ASC' };
+                break;
+            case 'date_desc':
+                order = { created_at: 'DESC' };
+                break;
+        }
+        //Pagination
+        const skip = (page - 1) * limit;
+        const [data, total] = await this.expenseRepo.findAndCount({ where, order, skip, take: limit });
+
+        return {
+            data,
+            page,
+            limit,
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
+        }
+
     }
 
     async getExpenseById(id: number, userId: number): Promise<Expense> {
-        const expenses = await this.getAllExpenses(userId);
-        const expense = expenses.find(exp => exp.id === id);
+        const expense = await this.expenseRepo.findOne({ where: { id, user_id: userId },});
         if (!expense) {
-          throw new NotFoundException('Expense not found');
-        }
+            throw new NotFoundException("Expense not found");
+            }
         return expense;
     }
 
@@ -76,21 +104,22 @@ export class ExpensesService {
         return expenses.reduce((total, expense) => total + Number(expense.amount ?? 0), 0);
     }
 
-    async deleteExpenseById(id: number, userId: number): Promise<boolean> {
+    async deleteExpenseById(id: number, userId: number): Promise<DeleteExpenseResponse> {
         try {
             const result = await this.expenseRepo.delete({ id, user_id: userId});
-        return(result.affected ?? 0) > 0;
+            
+            return{success:(result.affected ?? 0) > 0 , id:id};
         } catch (error) {
             console.error("Error deleting expense:", error);
             throw new InternalServerErrorException("Failed to delete expense");
         }
     }
 
-    async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<boolean>{
+    async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<UpdateExpenseResponse> {
         try {
             const result = await this.expenseRepo.update({ id, user_id: userId }, dto);
 
-            return (result.affected ?? 0) > 0;
+            return { success: (result.affected ?? 0) > 0, id: id };
         } catch (error) {
             console.error("Error updating expense:", error);
             throw new InternalServerErrorException("Failed to update expense");
