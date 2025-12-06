@@ -24,7 +24,9 @@ export class ExpensesController {
     const pageNum = (query.page ?? 0) > 0 ? query.page : 1;
     const limitNum = (query.limit ?? 0) > 0 ? query.limit : 20;
 
-    return this.expensesService.getFilteredExpenses(userId, {from: query.from, to: query.to, min: query.min, max: query.max, sort: query.sort, page: pageNum, limit: limitNum, search: query.search});
+    const { page, limit, ...rest } = query;
+
+    return this.expensesService.getFilteredExpenses(userId, { ...rest, page: pageNum, limit: limitNum });
   }
 
   @Get("reports")

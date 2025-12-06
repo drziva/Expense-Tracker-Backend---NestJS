@@ -6,26 +6,36 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UsersService } from 'src/users/users.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse, UpdateExpenseResponse } from './expenses.types';
+import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 
 @Injectable()
 export class ExpensesService {
     constructor(
         @InjectRepository(Expense)
         private expenseRepo: Repository<Expense>,
+
+        @InjectRepository(ExpenseGroup)
+        private groupRepo: Repository<ExpenseGroup>,
+
         private usersService: UsersService,
     ){}
     
     async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
         const user = await this.usersService.findById(userId);
+        if (!user) { throw new NotFoundException("User does not exist"); }
 
-        if (!user) {
-            throw new NotFoundException("User does not exist");
+        const group = await this.groupRepo.findOne({ where: { id: dto.group_id }});
+        if (!group) throw new NotFoundException("Group not found");
+        if (group.user_id !== userId) {
+        throw new ForbiddenException("Invalid group selection");
         }
+
         try {
             const expense = this.expenseRepo.create({
                 amount: dto.amount,
                 description: dto.description,
-                user: user,
+                group_id:dto.group_id,
+                user_id: userId,
             });
             const savedExpense = await this.expenseRepo.save(expense);
             return this.toExpenseResponse(savedExpense);
@@ -37,8 +47,39 @@ export class ExpensesService {
 
     async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};
-        const { from, to, min, max, sort, page = 1, limit = 20, search } = options;
+        const { from, to, min, max, sort, page = 1, limit = 20, search, group, group_id } = options;
         //Filtering
+        if (group_id !== undefined) {
+            const groupEntity = await this.groupRepo.findOne({
+                where: { id: group_id, user_id: userId }
+                });
+                if (!groupEntity) {
+                    return {
+                        data: [],
+                        page,
+                        limit,
+                        totalItems: 0,
+                        totalPages: 0
+                    };
+                }
+            where.group_id = group_id;
+        }
+        else if (group) {
+            const groupEntity = await this.groupRepo.findOne({
+            where: { name: group, user_id: userId }
+                });
+                if (!groupEntity) {
+                    return {
+                        data: [],
+                        page,
+                        limit,
+                        totalItems: 0,
+                        totalPages: 0
+                    };
+                }
+            where.group_id = groupEntity.id;
+        }
+
         if (from && to) {
             where.created_at = Between(from, to);
         } else if (from) {
@@ -47,6 +88,7 @@ export class ExpensesService {
             where.created_at = LessThanOrEqual(to);
         }
 
+        
         if (min !== undefined && max !== undefined) {
             where.amount = Between(min, max);
         } else if (min !== undefined) {
@@ -59,7 +101,6 @@ export class ExpensesService {
         }
         //Sorting
         let order: any = { created_at: 'DESC' }; // Default order
-        
         switch(sort) {
             case 'amount_asc':
                 order = { amount: 'ASC' };
@@ -85,14 +126,13 @@ export class ExpensesService {
             totalItems: total,
             totalPages: Math.ceil(total / limit),
         }
-
     }
 
     async getExpenseById(id: number, userId: number): Promise<ExpenseResponse> {
         const expense = await this.expenseRepo.findOne({ where: { id, user_id: userId },});
         if (!expense) {
             throw new NotFoundException("Expense not found");
-            }
+        }
         return this.toExpenseResponse(expense);
     }
 
@@ -121,29 +161,28 @@ export class ExpensesService {
 
     async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<UpdateExpenseResponse> {
         const expense = await this.expenseRepo.findOne({ where: { id } });
-        if (!expense) {
-            throw new NotFoundException("Expense not found");
+            if (!expense || expense.user_id !== userId) {
+                throw new NotFoundException("Expense not found");
         }
-        if (expense.user_id !== userId) {
-            throw new ForbiddenException("Unauthorized to update this expense");
+        if(dto.group_id) {
+            const group = await this.groupRepo.findOne({where:{id:dto.group_id}})
+            if(!group || group.user_id !== userId){
+                throw new NotFoundException("Group not found");
+            }
+            expense.group_id = dto.group_id;
         }
-        const updatedEntity = await this.expenseRepo.preload({
-            id,
-            ...dto,
-        });
-
-        if (!updatedEntity) {
-            throw new NotFoundException("Expense not found");
-        }
-        try {
-        const saved = await this.expenseRepo.save(updatedEntity);
-        return {
-            success: true,
-            expense: this.toExpenseResponse(saved),
-        };
-        } catch (error) {
-            console.error("Error updating expense:", error);
-            throw new InternalServerErrorException("Failed to update expense");
+        if(dto.amount !== undefined) expense.amount = dto.amount;
+        if(dto.description !== undefined) expense.description = dto.description;
+        
+        try{
+            const updatedExpense = await this.expenseRepo.save(expense);
+            return {
+                success:true,
+                expense: this.toExpenseResponse(updatedExpense)
+            }
+        } catch(error){
+            console.error(error);
+            throw new InternalServerErrorException("Updating expense failed");
         }
     }
 
@@ -158,6 +197,7 @@ export class ExpensesService {
             amount: Number(expense.amount),
             description: expense.description,
             createdAt: expense.created_at,
+            groupId: expense.group_id
         };
     }
 

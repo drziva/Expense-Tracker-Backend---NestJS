@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsEnum, IsString, IsDate } from "class-validator";
+import { IsOptional, IsEnum, IsString, IsDate, IsNumber } from "class-validator";
 import { Type } from "class-transformer";
 import type { ExpenseSort } from "../expense-sort.type";
 
@@ -48,4 +48,15 @@ export class GetExpensesQueryDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @ApiPropertyOptional({description: "Search by group name"})
+    @IsOptional()
+    @IsString()
+    group?: string;
+
+    @ApiPropertyOptional({description: "Search by group id"})
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    group_id?: number;
 }

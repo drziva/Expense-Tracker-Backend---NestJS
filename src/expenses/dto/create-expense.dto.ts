@@ -12,4 +12,9 @@ export class CreateExpenseDto {
     @IsNotEmpty()
     amount: number;
 
+    @ApiProperty({example: 3, description: 'The ID of associated group'})
+    @IsNotEmpty()
+    @IsNumber()
+    group_id: number
+
 }

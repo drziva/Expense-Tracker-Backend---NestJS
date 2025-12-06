@@ -15,4 +15,9 @@ export class UpdateExpenseDto {
   @IsNumber()
   @IsNotEmpty()
   amount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsNotEmpty()
+  group_id?:number
 }

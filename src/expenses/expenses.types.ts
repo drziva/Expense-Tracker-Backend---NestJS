@@ -11,6 +11,7 @@ export type ExpenseResponse = {
     amount: number;
     description: string;
     createdAt: Date;
+    groupId: number
 }
 
 export type UpdateExpenseResponse = {
@@ -35,4 +36,6 @@ export interface ExpenseQueryOptions {
     page?: number;
     limit?: number;
     search?: string;
+    group?: string;
+    group_id?: number;
 }
