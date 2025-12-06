@@ -5,7 +5,7 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typ
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UsersService } from 'src/users/users.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse, UpdateExpenseResponse } from './expenses.types';
+import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 
 @Injectable()
@@ -159,7 +159,7 @@ export class ExpensesService {
     }
     }
 
-    async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<UpdateExpenseResponse> {
+    async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<ExpenseResponse> {
         const expense = await this.expenseRepo.findOne({ where: { id } });
             if (!expense || expense.user_id !== userId) {
                 throw new NotFoundException("Expense not found");
@@ -176,10 +176,7 @@ export class ExpensesService {
         
         try{
             const updatedExpense = await this.expenseRepo.save(expense);
-            return {
-                success:true,
-                expense: this.toExpenseResponse(updatedExpense)
-            }
+            return this.toExpenseResponse(updatedExpense)
         } catch(error){
             console.error(error);
             throw new InternalServerErrorException("Updating expense failed");

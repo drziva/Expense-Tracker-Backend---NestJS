@@ -29,4 +29,7 @@ export class ExpenseGroup {
     @CreateDateColumn()
     created_at: Date;
 
+    @Column({ type: 'decimal', nullable: true })
+    monthly_budget_cap: number | null;
+
 }

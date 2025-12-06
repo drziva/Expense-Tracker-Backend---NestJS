@@ -1,7 +1,7 @@
 import { Controller,Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe } from "@nestjs/common";
 import { CreateExpenseDto } from "./dto/create-expense.dto";
 import { ExpensesService } from "./expenses.service";
-import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse, UpdateExpenseResponse } from "./expenses.types";
+import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from "./expenses.types";
 import { UserId } from "src/auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { ApiBearerAuth, ApiOperation,ApiResponse } from "@nestjs/swagger";
@@ -50,8 +50,8 @@ export class ExpensesController {
   @ApiResponse({ status: 200, description: "Expense found" })
   @ApiResponse({ status: 404, description: "Expense not found" })
 
-  async getExpenseById(@Param('id') id: number, @UserId() userId: number): Promise<ExpenseResponse> {
-    return this.expensesService.getExpenseById(+id, userId);
+  async getExpenseById(@Param('id', ParseIntPipe) id: number, @UserId() userId: number): Promise<ExpenseResponse> {
+    return this.expensesService.getExpenseById(id, userId);
   }
 
   @Post("add")
@@ -67,17 +67,17 @@ export class ExpensesController {
   @ApiResponse({ status: 200, description: "Expense updated successfully" })
   @ApiResponse({ status: 404, description: "Expense not found" })
   async updateExpense(
-    @Param("id",) id: number,
+    @Param("id", ParseIntPipe) id: number,
     @UserId() userId: number,
-    @Body() updateExpenseDto: UpdateExpenseDto): Promise<UpdateExpenseResponse> {
-      return await this.expensesService.updateExpenseById(+id,userId, updateExpenseDto);
+    @Body() updateExpenseDto: UpdateExpenseDto): Promise<ExpenseResponse> {
+      return await this.expensesService.updateExpenseById(id,userId, updateExpenseDto);
   }
 
   @Delete(":id")
   @ApiOperation({ summary: "Delete an expense by ID" })
   @ApiResponse({ status: 200, description: "Expense deleted successfully" })
   @ApiResponse({ status: 404, description: "Expense not found" })
-  async deleteExpense(@Param("id") id: number, @UserId() userId: number): Promise<DeleteExpenseResponse> {
-    return await this.expensesService.deleteExpenseById(+id,userId);
+  async deleteExpense(@Param("id", ParseIntPipe) id: number, @UserId() userId: number): Promise<DeleteExpenseResponse> {
+    return await this.expensesService.deleteExpenseById(id,userId);
   }
 }
