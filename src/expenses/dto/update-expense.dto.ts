@@ -1,23 +1,34 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class UpdateExpenseDto {
-  @ApiPropertyOptional({ example: 'BOSE Headphones', description: 'The description of the expense' })
-  @ValidateIf(o => !o.amount)
+  @ApiPropertyOptional({
+    example: 'Updated description',
+    description: 'New description for the expense'
+  })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   description?: string;
 
-  @ApiPropertyOptional({ example: 150.75, description: 'The amount of the expense' })
-  @ValidateIf(o => !o.description)
+  @ApiPropertyOptional({
+    example: 175.00,
+    description: 'Updated amount of the expense'
+  })
   @IsOptional()
-  @IsNumber()
-  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'amount must be a valid number' })
+  @Min(0)
   amount?: number;
 
+  @ApiPropertyOptional({
+    example: 4,
+    description: 'Updated group ID'
+  })
   @IsOptional()
-  @IsNumber()
-  @IsNotEmpty()
-  group_id?:number
+  @Type(() => Number)
+  @IsNumber({}, { message: 'group_id must be a valid number' })
+  @Min(1)
+  group_id?: number;
 }

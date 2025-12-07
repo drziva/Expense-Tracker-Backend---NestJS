@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsOptional, IsNumber, Min } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 
@@ -20,9 +20,12 @@ export class CreateGroupDto {
     description: string;
 
     @ApiPropertyOptional({
-    description: 'Monthly budget cap for this group (optional).', example: 300})
+        description: 'Monthly budget cap for this group (optional).',
+        example: 300
+    })
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
+    @Min(0)
     budgetCap?: number;
 }

@@ -1,5 +1,4 @@
 import { ExpenseSort } from "./expense-sort.type";
-import { Expense } from "./expenses.entity";
 
 export type DeleteExpenseResponse = {
     success: boolean;
@@ -12,11 +11,6 @@ export type ExpenseResponse = {
     description: string;
     createdAt: Date;
     groupId: number
-}
-
-export type UpdateExpenseResponse = {
-    success: boolean;
-    expense: ExpenseResponse;
 }
 
 export type GetExpenseResponse = {

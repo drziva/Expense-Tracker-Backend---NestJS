@@ -1,14 +1,14 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ExpenseGroup } from './expense-groups.entity.ts';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Between, Like, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupQueryOptions, GroupResponse } from './expense-groups.types';
-import { User } from 'src/users/user.entity';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
 import { ExpenseResponse } from 'src/expenses/expenses.types';
+import { BudgetStatusDto } from './dto/budget-status.dto.js';
 
 @Injectable()
 export class ExpenseGroupsService {
@@ -22,14 +22,12 @@ export class ExpenseGroupsService {
     ){}
 
     async getGroupById(userId: number, groupId: number): Promise<GroupResponse>{
-        await this.validateUser(userId);
         const group = await this.validateGroup(userId, groupId);
 
         return this.toGroupResponse(group);
     }
 
     async getExpensesForGroup(userId: number, groupId: number): Promise<ExpenseResponse[]> {
-        await this.validateUser(userId);
         await this.validateGroup(userId,groupId);
 
         const expenses = await this.expenseRepo.find({
@@ -39,9 +37,7 @@ export class ExpenseGroupsService {
     }
 
     async getFilteredGroups( userId: number, options: GroupQueryOptions): Promise<GetGroupResponse> {
-
         await this.validateUser(userId);
-
         const where: any = { user_id: userId };
         const { search, sort, page = 1, limit = 20 } = options;
 
@@ -87,9 +83,8 @@ export class ExpenseGroupsService {
     }
 
 
-    async addGroup(userId: number, dto: CreateGroupDto): Promise<GroupResponse>{
+    async createGroup(userId: number, dto: CreateGroupDto): Promise<GroupResponse>{
         await this.validateUser(userId);
-
         const groupExists = await this.expenseGroupRepo.findOne({where:{name:dto.name,user_id:userId}});
         if(groupExists) throw new ConflictException("Group with this name already exists");
 
@@ -109,7 +104,6 @@ export class ExpenseGroupsService {
     }       
 
     async updateGroup(userId:number, groupId:number, dto: UpdateGroupDto): Promise<GroupResponse> {
-        await this.validateUser(userId);
         const group = await this.validateGroup(userId, groupId);
 
         if (dto.name !== undefined && dto.name !== group.name) {
@@ -127,14 +121,15 @@ export class ExpenseGroupsService {
             group.description = dto.description;
         }
 
-        if (dto.budget_cap !== undefined) {
-            group.monthly_budget_cap = dto.budget_cap;
+        if (dto.budgetCap !== undefined) {
+            group.monthly_budget_cap = dto.budgetCap;
         }
+
 
 
         try {
         const updatedGroup = await this.expenseGroupRepo.save(group);
-            return this.toGroupResponse(updatedGroup)
+            return this.toGroupResponse(updatedGroup);
         } catch (error) {
         console.error(error);
             throw new InternalServerErrorException("Updating group failed");
@@ -142,7 +137,6 @@ export class ExpenseGroupsService {
     }
 
     async deleteGroup(userId: number, groupId: number): Promise<DeleteGroupResponse> {
-        await this.validateUser(userId);
         await this.validateGroup(userId,groupId);
 
         try {
@@ -166,8 +160,7 @@ export class ExpenseGroupsService {
         }
     } 
 
-    async getBudgetStatus(userId: number, groupId: number): Promise<BudgetStatus> {
-        await this.validateUser(userId);
+    async getBudgetStatus(userId: number, groupId: number): Promise<BudgetStatusDto> {
         const group = await this.validateGroup(userId, groupId);
 
         if (group.monthly_budget_cap === null) {
@@ -188,12 +181,13 @@ export class ExpenseGroupsService {
 
         const endOfMonth = new Date(startOfMonth);
         endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+        endOfMonth.setMilliseconds(endOfMonth.getMilliseconds() - 1);
 
         const expenses = await this.expenseRepo.find({
             where: {
                 user_id: userId,
                 group_id: groupId,
-                created_at: Between(startOfMonth, endOfMonth),
+                created_at: Between(startOfMonth,endOfMonth),
             },
         });
 
@@ -204,7 +198,7 @@ export class ExpenseGroupsService {
 
         const budgetCap = Number(group.monthly_budget_cap);
         const remaining = budgetCap - spentThisMonth;
-        const percentageUsed = spentThisMonth / budgetCap;
+        const percentageUsed = (spentThisMonth / budgetCap) * 100;
         const isOverBudget = spentThisMonth > budgetCap;
 
         return {
@@ -228,25 +222,23 @@ export class ExpenseGroupsService {
         };
     }
 
-    private async validateUser(userId: number): Promise<User>{
-        const user = await this.usersService.findById(userId);
-        if(!user) throw new NotFoundException(`User not found`);
-
-        return user;
-    }
-
-    private async validateGroup(userId:number, groupId: number) {
+    private async validateGroup(userId:number, groupId: number): Promise<ExpenseGroup> {
         const group = await this.expenseGroupRepo.findOne({
             where: { id: groupId, user_id: userId }
         });
         if (!group) {
-            throw new NotFoundException("Group was not found in database");
+            throw new NotFoundException("Group was not found for this user.");
         }
 
         return group;
     }
 
-    private toExpenseResponse(expense: Expense) {
+    private async validateUser(userId: number): Promise<void> {
+        const user = await this.usersService.findById(userId);
+        if(!user) throw new NotFoundException(`User not found`);
+    }
+
+    private toExpenseResponse(expense: Expense): ExpenseResponse {
     return {
         id: expense.id,
         amount: expense.amount,

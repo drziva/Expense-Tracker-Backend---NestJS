@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 
@@ -19,6 +19,8 @@ export class UpdateGroupDto {
   })
   @IsOptional()
   @Type(() => Number)
-  budget_cap?: number;
+  @IsNumber()
+  @Min(0)
+  budgetCap?: number;
 
 }

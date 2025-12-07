@@ -10,7 +10,7 @@ export class ExpenseGroup {
     @Column({ type: "varchar", length: 100 })
     name: string;
 
-    @Column({ type: "varchar", length: 100 })
+    @Column({ type: "text" })
     description: string;
     
     @Column()
@@ -29,7 +29,7 @@ export class ExpenseGroup {
     @CreateDateColumn()
     created_at: Date;
 
-    @Column({ type: 'decimal', nullable: true })
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
     monthly_budget_cap: number | null;
 
 }
