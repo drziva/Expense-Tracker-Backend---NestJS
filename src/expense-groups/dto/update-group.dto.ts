@@ -19,13 +19,14 @@ export class UpdateGroupDto {
   @IsString()
   description: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Updated monthly budget cap for the group.',
     example: 500
   })
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  budgetCap: number;
+  budgetCap?: number;
 
 }

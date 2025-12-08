@@ -37,7 +37,7 @@ export class ExpensesService {
     async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};
         const { from, to, min, max, sort, page = 1, limit = 20, search, group_id } = options;
-        //Filtering
+        //FilteringD
         if (group_id !== undefined) {
             where.group_id = group_id;
         }

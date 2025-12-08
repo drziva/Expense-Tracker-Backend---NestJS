@@ -115,7 +115,7 @@ export class ExpenseGroupsService {
         }
 
         group.description = dto.description;
-        group.monthly_budget_cap = dto.budgetCap;
+        group.monthly_budget_cap = dto.budgetCap ?? null;
         try {
             const updatedGroup = await this.expenseGroupRepo.save(group);
             return this.toGroupResponse(updatedGroup);
