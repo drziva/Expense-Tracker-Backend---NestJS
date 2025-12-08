@@ -1,5 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+} from "typeorm";
+
 import { User } from "src/users/user.entity";
+import { ExpenseGroup } from "src/expense-groups/expense-groups.entity.ts";
 
 @Entity("expenses")
 export class Expense {
@@ -13,12 +22,20 @@ export class Expense {
   amount: number;
 
   @Column()
-  user_id:number
+  user_id: number;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE" })
+  @Column()
+  group_id: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @ManyToOne(() => User, user => user.expenses, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @CreateDateColumn({ type: "datetime" })
-  created_at: Date;
+  @ManyToOne(() => ExpenseGroup, group => group.expenses, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "group_id" })
+  group: ExpenseGroup;
+
 }

@@ -1,6 +1,3 @@
-import { ExpenseSort } from "./expense-sort.type";
-import { Expense } from "./expenses.entity";
-
 export type DeleteExpenseResponse = {
     success: boolean;
     id: number;
@@ -11,11 +8,7 @@ export type ExpenseResponse = {
     amount: number;
     description: string;
     createdAt: Date;
-}
-
-export type UpdateExpenseResponse = {
-    success: boolean;
-    expense: ExpenseResponse;
+    groupId: number
 }
 
 export type GetExpenseResponse = {
@@ -35,4 +28,13 @@ export interface ExpenseQueryOptions {
     page?: number;
     limit?: number;
     search?: string;
+    group?: string;
+    group_id?: number;
+}
+
+export enum ExpenseSort {
+  DATE_DESC = 'date_desc',
+  DATE_ASC = 'date_asc',
+  AMOUNT_DESC = 'amount_desc',
+  AMOUNT_ASC = 'amount_asc',
 }

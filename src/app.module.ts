@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ExpensesModule } from './expenses/expenses.module';
+import { ExpenseGroupsModule } from './expense-groups/expense-groups.module';
 import config from './config';
 
 
@@ -28,7 +29,8 @@ import config from './config';
     }),
     UsersModule,
     AuthModule,
-    ExpensesModule
+    ExpensesModule,
+    ExpenseGroupsModule
   ],
 })
 export class AppModule {}

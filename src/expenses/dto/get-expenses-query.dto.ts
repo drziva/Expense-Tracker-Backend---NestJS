@@ -1,51 +1,61 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsEnum, IsString, IsDate } from "class-validator";
+import { IsOptional, IsEnum, IsString, IsDate, IsNumber } from "class-validator";
 import { Type } from "class-transformer";
-import type { ExpenseSort } from "../expense-sort.type";
+import { ExpenseSort } from "../expenses.types";
 
 export class GetExpensesQueryDto {
     @ApiPropertyOptional({ description: "Start date (YYYY-MM-DD)" })
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     from?: Date;
 
     @ApiPropertyOptional({ description: "End date (YYYY-MM-DD)" })
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     to?: Date;
 
     @ApiPropertyOptional({ description: "Minimum amount" })
     @IsOptional()
     @Type(() => Number)
+    @IsNumber()
     min?: number;
 
     @ApiPropertyOptional({ description: "Maximum amount" })
     @IsOptional()
     @Type(() => Number)
+    @IsNumber()
     max?: number;
 
     @ApiPropertyOptional({
-    description: "Sorting rules",
-    enum: ["date_asc", "date_desc", "amount_asc", "amount_desc"],
+        description: "Sorting rules",
+        enum: ExpenseSort,
     })
     @IsOptional()
-    @IsEnum(["date_asc", "date_desc", "amount_asc", "amount_desc"], { message: "Invalid sort option" })
+    @IsEnum(ExpenseSort, { message: "Invalid sort option" })
     sort?: ExpenseSort;
 
     @ApiPropertyOptional({ example: 1 })
     @IsOptional()
     @Type(() => Number)
+    @IsNumber()
     page?: number;
 
     @ApiPropertyOptional({ example: 20 })
     @IsOptional()
     @Type(() => Number)
+    @IsNumber()
     limit?: number;
 
     @ApiPropertyOptional({ description: "Search by description" })
     @IsOptional()
     @IsString()
     search?: string;
+
+    @ApiPropertyOptional({description: "Search by group id"})
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    group_id?: number;
 }
