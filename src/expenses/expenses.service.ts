@@ -1,9 +1,8 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './expenses.entity';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
-import { UsersService } from 'src/users/users.service';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
@@ -13,24 +12,14 @@ export class ExpensesService {
     constructor(
         @InjectRepository(Expense)
         private expenseRepo: Repository<Expense>,
-
         @InjectRepository(ExpenseGroup)
         private groupRepo: Repository<ExpenseGroup>,
-
-        private usersService: UsersService,
     ){}
     
     async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
-        const user = await this.usersService.findById(userId);
-        if (!user) { throw new NotFoundException("User does not exist"); }
-
-        const group = await this.groupRepo.findOne({ where: { id: dto.group_id }});
-        if (!group) throw new NotFoundException("Group not found");
-        if (group.user_id !== userId) {
-        throw new ForbiddenException("Invalid group selection");
-        }
-
         try {
+            const group = await this.groupRepo.findOne({ where: { id: dto.group_id, user_id:userId }});
+            if (!group) throw new NotFoundException("Group not found");
             const expense = this.expenseRepo.create({
                 amount: dto.amount,
                 description: dto.description,
@@ -41,43 +30,16 @@ export class ExpensesService {
             return this.toExpenseResponse(savedExpense);
         } catch (error) {
             console.error("Error creating expense:", error);
-            throw new InternalServerErrorException("Failed to create expense");
+            throw error;
         }
     }
 
     async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};
-        const { from, to, min, max, sort, page = 1, limit = 20, search, group, group_id } = options;
+        const { from, to, min, max, sort, page = 1, limit = 20, search, group_id } = options;
         //Filtering
         if (group_id !== undefined) {
-            const groupEntity = await this.groupRepo.findOne({
-                where: { id: group_id, user_id: userId }
-                });
-                if (!groupEntity) {
-                    return {
-                        data: [],
-                        page,
-                        limit,
-                        totalItems: 0,
-                        totalPages: 0
-                    };
-                }
             where.group_id = group_id;
-        }
-        else if (group) {
-            const groupEntity = await this.groupRepo.findOne({
-            where: { name: group, user_id: userId }
-                });
-                if (!groupEntity) {
-                    return {
-                        data: [],
-                        page,
-                        limit,
-                        totalItems: 0,
-                        totalPages: 0
-                    };
-                }
-            where.group_id = groupEntity.id;
         }
 
         if (from && to) {
@@ -88,7 +50,6 @@ export class ExpensesService {
             where.created_at = LessThanOrEqual(to);
         }
 
-        
         if (min !== undefined && max !== undefined) {
             where.amount = Between(min, max);
         } else if (min !== undefined) {
@@ -118,7 +79,6 @@ export class ExpensesService {
         //Pagination
         const skip = (page - 1) * limit;
         const [data, total] = await this.expenseRepo.findAndCount({ where, order, skip, take: limit});
-
         return {
             data: data.map( exp=> this.toExpenseResponse(exp) ),
             page,
@@ -155,31 +115,31 @@ export class ExpensesService {
             };
         } catch (error) {
             console.error("Error deleting expense:", error);
-            throw new InternalServerErrorException("Failed to delete expense");
-    }
+            throw error;
+        }
     }
 
     async updateExpenseById(id: number, userId: number, dto: UpdateExpenseDto): Promise<ExpenseResponse> {
-        const expense = await this.expenseRepo.findOne({ where: { id } });
-            if (!expense || expense.user_id !== userId) {
-                throw new NotFoundException("Expense not found");
-        }
-        if(dto.group_id) {
-            const group = await this.groupRepo.findOne({where:{id:dto.group_id}})
-            if(!group || group.user_id !== userId){
-                throw new NotFoundException("Group not found");
+      try{
+            const expense = await this.expenseRepo.findOne({ where: { id, user_id:userId } });
+                if (!expense) {
+                    throw new NotFoundException("Expense not found");
             }
-            expense.group_id = dto.group_id;
-        }
-        if(dto.amount !== undefined) expense.amount = dto.amount;
-        if(dto.description !== undefined) expense.description = dto.description;
-        
-        try{
+            if(dto.group_id) {
+                const group = await this.groupRepo.findOne({where:{id:dto.group_id, user_id:userId}})
+                if(!group){
+                    throw new NotFoundException("Group not found");
+                }
+                expense.group_id = dto.group_id;
+            }
+            expense.amount = dto.amount;
+            expense.description = dto.description;
+
             const updatedExpense = await this.expenseRepo.save(expense);
             return this.toExpenseResponse(updatedExpense)
         } catch(error){
             console.error(error);
-            throw new InternalServerErrorException("Updating expense failed");
+            throw error;
         }
     }
 
@@ -197,5 +157,4 @@ export class ExpensesService {
             groupId: expense.group_id
         };
     }
-
 }

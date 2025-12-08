@@ -1,5 +1,3 @@
-import { ExpenseSort } from "./expense-sort.type";
-
 export type DeleteExpenseResponse = {
     success: boolean;
     id: number;
@@ -32,4 +30,11 @@ export interface ExpenseQueryOptions {
     search?: string;
     group?: string;
     group_id?: number;
+}
+
+export enum ExpenseSort {
+  DATE_DESC = 'date_desc',
+  DATE_ASC = 'date_asc',
+  AMOUNT_DESC = 'amount_desc',
+  AMOUNT_ASC = 'amount_asc',
 }

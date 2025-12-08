@@ -3,20 +3,28 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 export class CreateExpenseDto {
-    @ApiProperty({ example: 'BOSE Headphones', description: 'The description of the expense' })
+    @ApiProperty({
+        example: 'BOSE Headphones', 
+        description: 'The description of the expense' 
+    })
     @IsNotEmpty()
     @IsString()
     description: string;
 
-    @ApiProperty({ example: 150.75, description: 'The amount of the expense' })
+    @ApiProperty({ 
+        example: 150.75,
+        description: 'The amount of the expense' 
+    })
     @Type(() => Number)
     @IsNumber()
-    @Min(0.1)
+    @Min(0)
     amount: number;
 
-    @ApiProperty({ example: 3, description: 'The ID of associated group' })
+    @ApiProperty({ 
+        description: 'The ID of associated group',
+        example: 3
+    })
     @Type(() => Number)
     @IsNumber()
-    @Min(1)
     group_id: number;
 }

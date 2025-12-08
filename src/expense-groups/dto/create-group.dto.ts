@@ -5,7 +5,7 @@ import { Type } from "class-transformer";
 export class CreateGroupDto {
     @ApiProperty({
         description: 'Name of the expense group.',
-        example: 'Groceries',
+        example: 'Groceries'
     })
     @IsNotEmpty()
     @IsString()

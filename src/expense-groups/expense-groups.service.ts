@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ExpenseGroup } from './expense-groups.entity.ts';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
@@ -8,7 +8,6 @@ import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupQueryOptions,
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
 import { ExpenseResponse } from 'src/expenses/expenses.types';
-import { BudgetStatusDto } from './dto/budget-status.dto.js';
 
 @Injectable()
 export class ExpenseGroupsService {
@@ -99,70 +98,50 @@ export class ExpenseGroupsService {
 
         return this.toGroupResponse(group);
         } catch(error) {
-            throw new InternalServerErrorException("Database error while creating expense group");
+            throw error;
         }
     }       
 
     async updateGroup(userId:number, groupId:number, dto: UpdateGroupDto): Promise<GroupResponse> {
         const group = await this.validateGroup(userId, groupId);
-
-        if (dto.name !== undefined && dto.name !== group.name) {
+        if (dto.name !== group.name) {
             const conflict = await this.expenseGroupRepo.findOne({
                 where: { name: dto.name, user_id: userId }
             });
-
             if (conflict) {
                 throw new ConflictException("Group with this name already exists");
             }
             group.name = dto.name;
         }
 
-        if (dto.description !== undefined) {
-            group.description = dto.description;
-        }
-
-        if (dto.budgetCap !== undefined) {
-            group.monthly_budget_cap = dto.budgetCap;
-        }
-
-
-
+        group.description = dto.description;
+        group.monthly_budget_cap = dto.budgetCap;
         try {
-        const updatedGroup = await this.expenseGroupRepo.save(group);
+            const updatedGroup = await this.expenseGroupRepo.save(group);
             return this.toGroupResponse(updatedGroup);
         } catch (error) {
-        console.error(error);
-            throw new InternalServerErrorException("Updating group failed");
+            console.error(error);
+            throw error;
         }
     }
 
     async deleteGroup(userId: number, groupId: number): Promise<DeleteGroupResponse> {
         await this.validateGroup(userId,groupId);
-
         try {
-            const result = await this.expenseGroupRepo.delete({
+            await this.expenseGroupRepo.delete({
                 id: groupId,
                 user_id: userId
             });
-
-            if (result.affected === 0) {
-                throw new NotFoundException("Group was not found for this user");
-            }
-
             return { success: true, id: groupId };
 
         } catch (error) {
-            if(error instanceof NotFoundException){  //Make sure 404 error doesn't get swallowed
-                throw error;
-            }
             console.error(error);
-            throw new InternalServerErrorException("Database error while deleting group");
+            throw error;
         }
     } 
 
-    async getBudgetStatus(userId: number, groupId: number): Promise<BudgetStatusDto> {
+    async getBudgetStatus(userId: number, groupId: number): Promise<BudgetStatus> {
         const group = await this.validateGroup(userId, groupId);
-
         if (group.monthly_budget_cap === null) {
             return {
                 groupId,
@@ -195,7 +174,6 @@ export class ExpenseGroupsService {
             (sum, exp) => sum + Number(exp.amount),
             0
         );
-
         const budgetCap = Number(group.monthly_budget_cap);
         const remaining = budgetCap - spentThisMonth;
         const percentageUsed = (spentThisMonth / budgetCap) * 100;

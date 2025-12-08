@@ -29,9 +29,16 @@ export type BudgetStatus = {
     isOverBudget: boolean,
 }
 
+export enum ExpenseSortOrder {
+  NAME_ASC = 'name_asc',
+  NAME_DESC = 'name_desc',
+  DATE_ASC = 'date_asc',
+  DATE_DESC = 'date_desc',
+}
+
 export interface GroupQueryOptions {
     search?: string;
-    sort?: 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc';
+    sort?: ExpenseSortOrder;
     page?: number;
     limit?: number;
 }

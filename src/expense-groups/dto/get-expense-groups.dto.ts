@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import { IsOptional, IsString } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
+import { ExpenseSortOrder } from "../expense-groups.types";
 
 export class GetGroupQueryDto {
   @IsOptional()
@@ -15,10 +16,10 @@ export class GetGroupQueryDto {
   @IsString()
   @ApiPropertyOptional({
     description: 'Sort order for results.',
-    enum: ['name_asc', 'name_desc', 'date_asc', 'date_desc'],
+    enum: ExpenseSortOrder,
     example: 'name_asc'
   })
-  sort?: 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc';
+  sort?: ExpenseSortOrder;
 
   @IsOptional()
   @Type(() => Number)
