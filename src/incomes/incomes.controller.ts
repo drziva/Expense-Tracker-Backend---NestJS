@@ -1,0 +1,95 @@
+import { Controller, Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe } from "@nestjs/common";
+import { CreateIncomeDto } from "./dto/create-income.dto";
+import { IncomesService } from "./incomes.service";
+import { DeleteIncomeResponse, IncomeResponse, GetIncomeResponse } from "./incomes.types";
+import { UserId } from "src/auth/user-id.decorator";
+import { UpdateIncomeDto } from "./dto/update-income.dto";
+import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { GetIncomesQueryDto } from "./dto/get-incomes-query.dto";
+
+@ApiBearerAuth()
+@Controller("incomes")
+export class IncomesController {
+  constructor(private readonly incomesService: IncomesService) {}
+
+  @Get()
+  @ApiOperation({ summary: "Get filtered, sorted, paginated list of incomes" })
+  @ApiResponse({ status: 200, description: "Paginated list of incomes returned successfully" })
+  async getFiltered(
+    @UserId() userId: number,
+    @Query() query: GetIncomesQueryDto
+  ): Promise<GetIncomeResponse> {
+
+    const pageNum = (query.page ?? 0) > 0 ? query.page : 1;
+    const limitNum = (query.limit ?? 0) > 0 ? query.limit : 20;
+
+    const { page, limit, ...rest } = query;
+
+    return this.incomesService.getFilteredIncomes(userId, {
+      ...rest,
+      page: pageNum,
+      limit: limitNum,
+    });
+  }
+
+  @Get("reports")
+  @ApiOperation({ summary: "Get income reports for the user" })
+  async getIncomeReport(
+    @UserId() userId: number,
+    @Query() query: GetIncomesQueryDto
+  ){
+    return { message: "Report generation not yet implemented." };
+  }
+
+  @Get("total")
+  @ApiOperation({ summary: "Get the total sum of all incomes for the user" })
+  @ApiResponse({ status: 200, description: "Total sum returned successfully" })
+  async getTotalIncomes(@UserId() userId: number): Promise<number> {
+    return this.incomesService.getTotalIncomesValue(userId);
+  }
+
+  @Get(":id")
+  @ApiOperation({ summary: "Get a single income by ID" })
+  @ApiResponse({ status: 200, description: "Income found" })
+  @ApiResponse({ status: 404, description: "Income not found" })
+  async getIncomeById(
+    @Param('id', ParseIntPipe) id: number,
+    @UserId() userId: number
+  ): Promise<IncomeResponse> {
+    return this.incomesService.getIncomeById(id, userId);
+  }
+
+  @Post("add")
+  @ApiOperation({ summary: "Create a new income" })
+  @ApiResponse({ status: 201, description: "Income created successfully" })
+  @ApiResponse({ status: 400, description: "Invalid input data" })
+  async create(
+    @Body() dto: CreateIncomeDto,
+    @UserId() userId: number
+  ): Promise<IncomeResponse> {
+    return await this.incomesService.create(dto, userId);
+  }
+
+  @Put(":id")
+  @ApiOperation({ summary: "Update an existing income by ID" })
+  @ApiResponse({ status: 200, description: "Income updated successfully" })
+  @ApiResponse({ status: 404, description: "Income not found" })
+  async updateIncome(
+    @Param("id", ParseIntPipe) id: number,
+    @UserId() userId: number,
+    @Body() updateIncomeDto: UpdateIncomeDto
+  ): Promise<IncomeResponse> {
+    return await this.incomesService.updateIncomeById(id, userId, updateIncomeDto);
+  }
+
+  @Delete(":id")
+  @ApiOperation({ summary: "Delete an income by ID" })
+  @ApiResponse({ status: 200, description: "Income deleted successfully" })
+  @ApiResponse({ status: 404, description: "Income not found" })
+  async deleteIncome(
+    @Param("id", ParseIntPipe) id: number,
+    @UserId() userId: number
+  ): Promise<DeleteIncomeResponse> {
+    return await this.incomesService.deleteIncomeById(id, userId);
+  }
+}

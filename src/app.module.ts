@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { ExpenseGroupsModule } from './expense-groups/expense-groups.module';
+import { IncomesModule } from './incomes/incomes.module';
+import { IncomeGroupsModule } from './income-groups/income-groups.module';
 import config from './config';
 
 
@@ -30,7 +32,9 @@ import config from './config';
     UsersModule,
     AuthModule,
     ExpensesModule,
-    ExpenseGroupsModule
+    ExpenseGroupsModule,
+    IncomesModule,
+    IncomeGroupsModule
   ],
 })
 export class AppModule {}

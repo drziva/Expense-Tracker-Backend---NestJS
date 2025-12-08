@@ -59,7 +59,6 @@ export class ExpenseGroupsController {
         return this.expenseGroupsService.getExpensesForGroup(userId, id);
     }
 
-
     @ApiOperation({ summary: 'Get a specific group by ID.' })
     @ApiParam({ name: 'id', type: Number })
     @ApiResponse({ status: 200, description: 'Group returned successfully.' })
