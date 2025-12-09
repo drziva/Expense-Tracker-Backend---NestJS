@@ -18,6 +18,9 @@ export class User {
   @Column()
   email: string;
 
+  @Column({ type: 'boolean', default: false })
+  premium: boolean;
+
   @OneToMany(() => ExpenseGroup, group => group.user)
   expenseGroups: ExpenseGroup[];
 

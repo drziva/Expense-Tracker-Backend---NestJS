@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import { LoginResponse } from './auth.types';
+import { LoginResponse } from './dto/login-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,9 +27,10 @@ export class AuthService {
         );
         
         const token = await this.jwtService.signAsync({
-            sub: user.id,
+            id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            premium: user.premium
         });
 
         const response: LoginResponse = {
@@ -37,7 +38,8 @@ export class AuthService {
             user: {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                premium: user.premium
             }
         }
 
@@ -60,7 +62,8 @@ export class AuthService {
         const payload = {
                 sub: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                premium: user.premium
         }
         
         const token = await this.jwtService.signAsync(payload);
@@ -69,8 +72,9 @@ export class AuthService {
             access_token: token,
             user: {
                 id: payload.sub,
-                username: payload.username,
-                email: payload.email
+                username: user.username,
+                email: user.email,
+                premium: user.premium
             }
         }
 
