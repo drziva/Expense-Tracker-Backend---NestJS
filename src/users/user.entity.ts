@@ -1,8 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { Expense } from 'src/expenses/expenses.entity';
+import { Income } from 'src/incomes/incomes.entity';
+import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 
-@Entity()
+@Entity("user")
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,4 +23,10 @@ export class User {
 
   @OneToMany(() => Expense, expense => expense.user)
   expenses: Expense[];
+
+  @OneToMany(() => IncomeGroup, group => group.user)
+  incomeGroups: IncomeGroup[];
+
+  @OneToMany(() => Income, income => income.user)
+  incomes: Income[];
 }

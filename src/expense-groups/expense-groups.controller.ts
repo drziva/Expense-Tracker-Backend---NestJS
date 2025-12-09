@@ -5,10 +5,10 @@ import { UserId } from 'src/auth/user-id.decorator';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { ExpenseGroupsService } from './expense-groups.service';
 import { GetGroupQueryDto } from './dto/get-expense-groups.dto';
-import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './expense-groups.types';
-import { ExpenseResponse } from 'src/expenses/expenses.types';
+import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-returns.dto';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-returns.dto';
 import { BudgetStatusDto } from './dto/budget-status.dto';
 
 
@@ -19,7 +19,10 @@ export class ExpenseGroupsController {
     constructor(private expenseGroupsService: ExpenseGroupsService) {}
 
     @ApiOperation({ summary: 'Get all groups for user with filtering, sorting, and pagination.' })
-    @ApiResponse({ status: 200, description: 'List of groups returned successfully.' })
+    @ApiOkResponse({ 
+        description: 'List of groups returned successfully.',
+        type: GetGroupResponse
+    })
     @Get()
     async getAllGroups(
         @UserId() userId: number,
@@ -37,7 +40,10 @@ export class ExpenseGroupsController {
 
     @ApiOperation({ summary: 'Get budget usage for this group (current month).' })
     @ApiParam({ name: 'id', type: Number })
-    @ApiResponse({ status: 200, description: 'Budget status returned.', type: BudgetStatusDto })
+    @ApiOkResponse({ 
+        description: 'Budget status returned.',
+        type: BudgetStatus 
+    })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Get(':id/budget')
     async getBudgetStatus(
@@ -49,7 +55,11 @@ export class ExpenseGroupsController {
     
     @ApiOperation({ summary: 'Get all expenses belonging to a specific group.' })
     @ApiParam({ name: 'id', type: Number, description: 'Group ID' })
-    @ApiResponse({ status: 200, description: 'List of expenses for this group.' })
+    @ApiOkResponse({ 
+        description: 'List of expenses for this group.',
+        type: ExpenseResponse,
+        isArray: true
+    })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Get(':id/expenses')
     async getExpensesForGroup(
@@ -59,10 +69,12 @@ export class ExpenseGroupsController {
         return this.expenseGroupsService.getExpensesForGroup(userId, id);
     }
 
-
     @ApiOperation({ summary: 'Get a specific group by ID.' })
     @ApiParam({ name: 'id', type: Number })
-    @ApiResponse({ status: 200, description: 'Group returned successfully.' })
+    @ApiOkResponse({ 
+        description: 'Group returned successfully.',
+        type: GroupResponse 
+    })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Get(':id')
     async getGroup(
@@ -74,7 +86,10 @@ export class ExpenseGroupsController {
 
     @ApiOperation({ summary: 'Create a new expense group.' })
     @ApiBody({ type: CreateGroupDto })
-    @ApiResponse({ status: 201, description: 'Group created successfully.' })
+    @ApiCreatedResponse({ 
+        description: 'Group created successfully.',
+        type: GroupResponse 
+    })
     @ApiResponse({ status: 409, description: 'Group with this name already exists.' })
     @Post()
     async createGroup(
@@ -86,7 +101,10 @@ export class ExpenseGroupsController {
 
     @ApiOperation({ summary: 'Update an existing expense group.' })
     @ApiParam({ name: 'id', type: Number })
-    @ApiResponse({ status: 200, description: 'Group updated successfully.' })
+    @ApiOkResponse({ 
+        description: 'Group updated successfully.',
+        type: GroupResponse 
+    })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Put(':id')
     async updateGroup(
@@ -99,7 +117,10 @@ export class ExpenseGroupsController {
 
     @ApiOperation({ summary: 'Delete a specific group (cascade deletes expenses).' })
     @ApiParam({ name: 'id', type: Number })
-    @ApiResponse({ status: 200, description: 'Group deleted successfully.' })
+    @ApiOkResponse({ 
+        description: 'Group deleted successfully.',
+        type: DeleteGroupResponse 
+    })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Delete(':id')
     async deleteGroup(

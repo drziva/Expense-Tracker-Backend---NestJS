@@ -1,9 +1,9 @@
-export interface ExpenseQueryOptions {
+export interface IncomeQueryOptions {
     from?: Date;
     to?: Date;
     min?: number;
     max?: number;
-    sort?: ExpenseSort;
+    sort?: IncomeSort;
     page?: number;
     limit?: number;
     search?: string;
@@ -11,7 +11,7 @@ export interface ExpenseQueryOptions {
     group_id?: number;
 }
 
-export enum ExpenseSort {
+export enum IncomeSort {
   DATE_DESC = 'date_desc',
   DATE_ASC = 'date_asc',
   AMOUNT_DESC = 'amount_desc',

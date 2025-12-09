@@ -4,7 +4,8 @@ import { Expense } from './expenses.entity';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse } from './expenses.types';
+import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-returns.dto';
+import { ExpenseQueryOptions } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 
 @Injectable()
@@ -96,10 +97,6 @@ export class ExpensesService {
         return this.toExpenseResponse(expense);
     }
 
-    async getCustomReport(userId: number, from?: Date, to?: Date) {
-        return { message: "Report generation not yet implemented." };
-    }
-
     async getTotalExpensesValue(userId: number): Promise<number> {
         const expenses = await this.getAllExpenses(userId);
         return expenses.reduce((total, expense) => total + Number(expense.amount ?? 0), 0);
@@ -141,6 +138,18 @@ export class ExpensesService {
             console.error(error);
             throw error;
         }
+    }
+
+    async getForReport(userId: number, from?: Date, to?: Date): Promise<Expense[]> {
+        const where: any = {user_id : userId}
+        if(from && to){
+            where.created_at = Between(from,to);
+        } else if(from){
+            where.created_at = MoreThanOrEqual(from);
+        } else if(to){
+            where.created_at = LessThanOrEqual(to);
+        }
+        return await this.expenseRepo.find({where});
     }
 
     private async getAllExpenses(userId: number): Promise<ExpenseResponse[]> {

@@ -16,6 +16,6 @@ import { ExpenseGroupsModule } from 'src/expense-groups/expense-groups.module';
   
   controllers: [ExpensesController],
   providers: [ExpensesService],
-  exports: [TypeOrmModule] 
+  exports: [ExpensesService]
 })
 export class ExpensesModule {}

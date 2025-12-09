@@ -4,10 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Between, Like, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupQueryOptions, GroupResponse } from './expense-groups.types';
+import { GroupQueryOptions } from './expense-groups.types';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
-import { ExpenseResponse } from 'src/expenses/expenses.types';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-returns.dto';
+import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-returns.dto';
 
 @Injectable()
 export class ExpenseGroupsService {
@@ -16,7 +17,6 @@ export class ExpenseGroupsService {
         private expenseGroupRepo: Repository<ExpenseGroup>,
         @InjectRepository(Expense)
         private expenseRepo: Repository<Expense>,
-
         private usersService: UsersService,
     ){}
 
@@ -188,6 +188,16 @@ export class ExpenseGroupsService {
             percentageUsed,
             isOverBudget,
         };
+    }
+
+    async getGroupsForUser(userId: number): Promise<Record<number,string>> {
+        const groups = await this.expenseGroupRepo.find({where:{user_id:userId}})
+        const groupNames: Record<number,string> = {};
+        for(const group of groups){
+            groupNames[group.id] = group.name ;
+        }
+
+        return groupNames;
     }
 
     private toGroupResponse(expenseGroup: ExpenseGroup): GroupResponse {
