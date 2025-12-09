@@ -166,6 +166,16 @@ export class IncomeGroupsService {
         };
     }
 
+    async getGroupsForUser(userId: number): Promise<Record<number,string>> {
+        const groups = await this.incomeGroupRepo.find({where:{user_id:userId}})
+        const groupNames: Record<number,string> = {};
+        for(const group of groups){
+            groupNames[group.id] = group.name ;
+        }
+
+        return groupNames;
+    }
+
     private async validateGroup(userId: number, groupId: number): Promise<IncomeGroup> {
         const group = await this.incomeGroupRepo.findOne({
         where: { id: groupId, user_id: userId },

@@ -152,6 +152,18 @@ export class IncomesService {
         return incomes.reduce((total,income) => total + Number(income.amount ?? 0), 0);
     }
 
+    async getForReport(userId: number, from?: Date, to?: Date): Promise<Income[]> {
+        const where: any = {user_id : userId}
+        if(from && to){
+            where.created_at = Between(from,to);
+        } else if(from){
+            where.created_at = MoreThanOrEqual(from);
+        } else if(to){
+            where.created_at = LessThanOrEqual(to);
+        }
+        return await this.incomeRepo.find({where});
+    }
+
     private async getAllIncomes(userId: number): Promise<IncomeResponse[]> {
         const incomes = await this.incomeRepo.find({ where: { user_id: userId } });
         return incomes.map(income => this.toIncomeResponse(income));

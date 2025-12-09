@@ -32,15 +32,6 @@ export class IncomesController {
     });
   }
 
-  @Get("reports")
-  @ApiOperation({ summary: "Get income reports for the user" })
-  async getIncomeReport(
-    @UserId() userId: number,
-    @Query() query: GetIncomesQueryDto
-  ){
-    return { message: "Report generation not yet implemented." };
-  }
-
   @Get("total")
   @ApiOperation({ summary: "Get the total sum of all incomes for the user" })
   @ApiResponse({ status: 200, description: "Total sum returned successfully" })

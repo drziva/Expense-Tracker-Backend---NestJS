@@ -29,15 +29,6 @@ export class ExpensesController {
     return this.expensesService.getFilteredExpenses(userId, { ...rest, page: pageNum, limit: limitNum });
   }
 
-  @Get("reports")
-  @ApiOperation({ summary: "Get expense reports for the user" })
-  async getExpenseReport(
-    @UserId() userId: number,
-    @Query() query: GetExpensesQueryDto
-  ){
-    return { message: "Report generation not yet implemented." };
-  }
-
   @Get("total")
   @ApiOperation({ summary: "Get the total sum of all expenses for the user" })
   @ApiResponse({ status: 200, description: "Total sum returned successfully" })

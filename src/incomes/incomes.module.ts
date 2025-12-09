@@ -14,6 +14,7 @@ import { IncomeGroupsModule } from 'src/income-groups/income-groups.module';
         IncomeGroupsModule
     ],
     controllers: [IncomesController],
-    providers: [IncomesService]
+    providers: [IncomesService],
+    exports: [IncomesService]
 })
 export class IncomesModule {}

@@ -16,7 +16,6 @@ export class ExpenseGroupsService {
         private expenseGroupRepo: Repository<ExpenseGroup>,
         @InjectRepository(Expense)
         private expenseRepo: Repository<Expense>,
-
         private usersService: UsersService,
     ){}
 
@@ -188,6 +187,16 @@ export class ExpenseGroupsService {
             percentageUsed,
             isOverBudget,
         };
+    }
+
+    async getGroupsForUser(userId: number): Promise<Record<number,string>> {
+        const groups = await this.expenseGroupRepo.find({where:{user_id:userId}})
+        const groupNames: Record<number,string> = {};
+        for(const group of groups){
+            groupNames[group.id] = group.name ;
+        }
+
+        return groupNames;
     }
 
     private toGroupResponse(expenseGroup: ExpenseGroup): GroupResponse {

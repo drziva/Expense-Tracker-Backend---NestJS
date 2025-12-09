@@ -7,6 +7,7 @@ import { ExpensesModule } from './expenses/expenses.module';
 import { ExpenseGroupsModule } from './expense-groups/expense-groups.module';
 import { IncomesModule } from './incomes/incomes.module';
 import { IncomeGroupsModule } from './income-groups/income-groups.module';
+import { ReportsModule } from './reports/reports.module';
 import config from './config';
 
 
@@ -34,7 +35,8 @@ import config from './config';
     ExpensesModule,
     ExpenseGroupsModule,
     IncomesModule,
-    IncomeGroupsModule
-  ],
+    IncomeGroupsModule,
+    ReportsModule
+  ]
 })
 export class AppModule {}
