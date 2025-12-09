@@ -23,7 +23,7 @@ export class ReportsService {
         const incomes = await this.incomesService.getForReport(userId, from, to);
 
         if(expenses.length === 0 && incomes.length === 0){
-            throw new NotFoundException("There aren't any incomes or expenses for generating the report!")
+            throw new NotFoundException("There aren't any incomes or expenses for generating the report")
         }
 
         const totalIncomes = this.sum(incomes);
@@ -55,7 +55,7 @@ export class ReportsService {
         const report: ReportResponse = await this.getReport(userId, options);
         const html = renderReportTemplate(report);
         const pdf = await this.htmlToPdf(html);
-        
+
         return pdf;
     }
 

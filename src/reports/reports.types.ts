@@ -8,7 +8,7 @@ export type ReportResponse = {
 
     incomes: Income[],
     expenses: Expense[],
-    
+
     expensesByGroup: Record<string,number>,
     incomesByGroup: Record<string, number>
 }
