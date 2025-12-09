@@ -1,24 +1,3 @@
-export type DeleteIncomeResponse = {
-    success: boolean;
-    id: number;
-}
-
-export type IncomeResponse = {
-    id: number;
-    amount: number;
-    description: string;
-    createdAt: Date;
-    groupId: number
-}
-
-export type GetIncomeResponse = {
-    data: IncomeResponse[],
-    page: number,
-    limit: number,
-    totalItems: number,
-    totalPages: number, 
-};
-
 export interface IncomeQueryOptions {
     from?: Date;
     to?: Date;

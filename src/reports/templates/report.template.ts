@@ -1,4 +1,4 @@
-import { ReportResponse } from "../reports.types";
+import { ReportResponse } from "../dto/reports-returns.dto";
 
 export function renderReportTemplate(report: ReportResponse): string {
   const money = (n: number) =>

@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { Income } from './incomes.entity';
 import { CreateIncomeDto } from './dto/create-income.dto';
-import { DeleteIncomeResponse, GetIncomeResponse, IncomeQueryOptions, IncomeResponse } from './incomes.types';
+import { DeleteIncomeResponse, GetIncomeResponse, IncomeResponse } from './dto/incomes-returns.dto';
+import { IncomeQueryOptions } from './incomes.types';
 import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 

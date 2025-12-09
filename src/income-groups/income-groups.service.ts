@@ -4,16 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Like, Repository } from 'typeorm';
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
-import {
-  DeleteIncomeGroupResponse,
-  GetIncomeGroupResponse,
-  IncomeGroupQueryOptions,
-  IncomeGroupResponse
-} from './income-groups.types';
+import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-returns.dto';
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
 import { Income } from 'src/incomes/incomes.entity';
-import { IncomeResponse } from 'src/incomes/incomes.types';
-
+import { IncomeResponse } from 'src/incomes/dto/incomes-returns.dto';
+import { IncomeGroupQueryOptions } from './income-groups.types';
 
 @Injectable()
 export class IncomeGroupsService {

@@ -1,26 +1,24 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { UserId } from 'src/auth/user-id.decorator';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
-import { ReportResponse } from './reports.types';
+import { ReportResponse } from './dto/reports-returns.dto';
 
 @ApiTags('Reports')
 @ApiBearerAuth()
 @Controller('reports')
 export class ReportsController {
-    constructor(
-        private reportsService: ReportsService
-    ) {}
+    constructor(private reportsService: ReportsService) {}
 
     @Get()
     @ApiOperation({
         summary: 'Generate a JSON financial report for the specified date range.',
     })
-    @ApiResponse({
-        status: 200,
+    @ApiOkResponse({
         description: 'Returns a JSON report that includes incomes, expenses, totals, and grouped results.',
+        type: ReportResponse
     })
     @ApiResponse({
         status: 404,
@@ -42,7 +40,10 @@ export class ReportsController {
         description: 'A PDF file containing the financial report.',
         content: {
             'application/pdf': {
-                schema: { type: 'string', format: 'binary' },
+                schema: {
+                    type: 'string',
+                    format: 'binary',
+                },
             },
         },
     })

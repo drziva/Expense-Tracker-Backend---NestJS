@@ -4,7 +4,7 @@ import { IncomesService } from 'src/incomes/incomes.service';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
 import { ExpenseGroupsService } from 'src/expense-groups/expense-groups.service';
 import { IncomeGroupsService } from 'src/income-groups/income-groups.service';
-import { ReportResponse } from './reports.types';
+import { ReportResponse } from './dto/reports-returns.dto';
 import { renderReportTemplate } from './templates/report.template';
 import * as puppeteer from "puppeteer";
 
@@ -80,31 +80,38 @@ export class ReportsService {
     }
 
     private async htmlToPdf(html: string): Promise<Buffer> {
-        const browser = await puppeteer.launch({
-            headless: true,          
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        });
+        let browser;
+        try {
+            browser = await puppeteer.launch({
+                headless: true,
+                args: ["--no-sandbox", "--disable-setuid-sandbox"],
+            });
 
-        const page = await browser.newPage();
+            const page = await browser.newPage();
 
-        await page.setContent(html, {
-            waitUntil: "networkidle0",
-        });
+            await page.setContent(html, {
+                waitUntil: "networkidle0",
+            });
 
-        const pdfUint8 = await page.pdf({
-            format: "A4",
-            printBackground: true,
-            margin: {
-            top: "20px",
-            bottom: "20px",
-            left: "20px",
-            right: "20px",
-            },
-        });
-        const pdfBuffer = Buffer.from(pdfUint8);
+            const pdfUint8 = await page.pdf({
+                format: "A4",
+                printBackground: true,
+                margin: {
+                    top: "20px",
+                    bottom: "20px",
+                    left: "20px",
+                    right: "20px",
+                },
+            });
 
-        await browser.close();
-        return pdfBuffer;
+            return Buffer.from(pdfUint8);
+        } 
+        finally {
+            if (browser) {
+                await browser.close();
+            }
+        }
     }
+
 
 }

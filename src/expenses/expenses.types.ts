@@ -1,24 +1,3 @@
-export type DeleteExpenseResponse = {
-    success: boolean;
-    id: number;
-}
-
-export type ExpenseResponse = {
-    id: number;
-    amount: number;
-    description: string;
-    createdAt: Date;
-    groupId: number
-}
-
-export type GetExpenseResponse = {
-    data: ExpenseResponse[],
-    page: number,
-    limit: number,
-    totalItems: number,
-    totalPages: number, 
-};
-
 export interface ExpenseQueryOptions {
     from?: Date;
     to?: Date;

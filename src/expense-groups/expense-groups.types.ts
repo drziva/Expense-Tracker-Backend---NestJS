@@ -1,24 +1,3 @@
-export type GroupResponse = {
-    id: number,
-    userId: number,
-    name: string,
-    description: string,
-    createdAt: Date,
-}
-
-export type DeleteGroupResponse = {
-    success: boolean,
-    id: number
-}
-
-export type GetGroupResponse = {
-    data: GroupResponse[];
-    page: number;
-    limit: number;
-    totalItems: number;
-    totalPages: number;
-};
-
 export type BudgetStatus = {
     groupId: number,
     hasBudget: boolean,

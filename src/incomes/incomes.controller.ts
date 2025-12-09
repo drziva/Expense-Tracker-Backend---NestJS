@@ -1,10 +1,18 @@
-import { Controller, Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe } from "@nestjs/common";
+import { 
+  Controller, Post, Body, Get, Delete, Param, ParseIntPipe, Put, Query 
+} from "@nestjs/common";
 import { CreateIncomeDto } from "./dto/create-income.dto";
 import { IncomesService } from "./incomes.service";
-import { DeleteIncomeResponse, IncomeResponse, GetIncomeResponse } from "./incomes.types";
+import { DeleteIncomeResponse, IncomeResponse, GetIncomeResponse } from "./dto/incomes-returns.dto";
 import { UserId } from "src/auth/user-id.decorator";
 import { UpdateIncomeDto } from "./dto/update-income.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { 
+  ApiBearerAuth, 
+  ApiOperation,
+  ApiResponse,
+  ApiOkResponse,
+  ApiCreatedResponse
+} from "@nestjs/swagger";
 import { GetIncomesQueryDto } from "./dto/get-incomes-query.dto";
 
 @ApiBearerAuth()
@@ -14,7 +22,10 @@ export class IncomesController {
 
   @Get()
   @ApiOperation({ summary: "Get filtered, sorted, paginated list of incomes" })
-  @ApiResponse({ status: 200, description: "Paginated list of incomes returned successfully" })
+  @ApiOkResponse({
+    description: "Paginated list of incomes returned successfully.",
+    type: GetIncomeResponse
+  })
   async getFiltered(
     @UserId() userId: number,
     @Query() query: GetIncomesQueryDto
@@ -34,14 +45,20 @@ export class IncomesController {
 
   @Get("total")
   @ApiOperation({ summary: "Get the total sum of all incomes for the user" })
-  @ApiResponse({ status: 200, description: "Total sum returned successfully" })
+  @ApiOkResponse({
+    description: "Total sum returned successfully",
+    schema: { type: "number", example: 3250 }
+  })
   async getTotalIncomes(@UserId() userId: number): Promise<number> {
     return this.incomesService.getTotalIncomesValue(userId);
   }
 
   @Get(":id")
   @ApiOperation({ summary: "Get a single income by ID" })
-  @ApiResponse({ status: 200, description: "Income found" })
+  @ApiOkResponse({
+    description: "Income found",
+    type: IncomeResponse
+  })
   @ApiResponse({ status: 404, description: "Income not found" })
   async getIncomeById(
     @Param('id', ParseIntPipe) id: number,
@@ -52,7 +69,10 @@ export class IncomesController {
 
   @Post("add")
   @ApiOperation({ summary: "Create a new income" })
-  @ApiResponse({ status: 201, description: "Income created successfully" })
+  @ApiCreatedResponse({
+    description: "Income created successfully",
+    type: IncomeResponse
+  })
   @ApiResponse({ status: 400, description: "Invalid input data" })
   async create(
     @Body() dto: CreateIncomeDto,
@@ -63,7 +83,10 @@ export class IncomesController {
 
   @Put(":id")
   @ApiOperation({ summary: "Update an existing income by ID" })
-  @ApiResponse({ status: 200, description: "Income updated successfully" })
+  @ApiOkResponse({
+    description: "Income updated successfully",
+    type: IncomeResponse
+  })
   @ApiResponse({ status: 404, description: "Income not found" })
   async updateIncome(
     @Param("id", ParseIntPipe) id: number,
@@ -75,7 +98,10 @@ export class IncomesController {
 
   @Delete(":id")
   @ApiOperation({ summary: "Delete an income by ID" })
-  @ApiResponse({ status: 200, description: "Income deleted successfully" })
+  @ApiOkResponse({
+    description: "Income deleted successfully",
+    type: DeleteIncomeResponse
+  })
   @ApiResponse({ status: 404, description: "Income not found" })
   async deleteIncome(
     @Param("id", ParseIntPipe) id: number,

@@ -4,7 +4,8 @@ import { Expense } from './expenses.entity';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { DeleteExpenseResponse, ExpenseQueryOptions, ExpenseResponse, GetExpenseResponse } from './expenses.types';
+import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-returns.dto';
+import { ExpenseQueryOptions } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 
 @Injectable()

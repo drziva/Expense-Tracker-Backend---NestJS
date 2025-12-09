@@ -4,10 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Between, Like, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupQueryOptions, GroupResponse } from './expense-groups.types';
+import { GroupQueryOptions } from './expense-groups.types';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
-import { ExpenseResponse } from 'src/expenses/expenses.types';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-returns.dto';
+import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-returns.dto';
 
 @Injectable()
 export class ExpenseGroupsService {
