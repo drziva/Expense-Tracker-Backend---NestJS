@@ -5,6 +5,8 @@ import { GetReportQueryDto } from './dto/get-report-query.dto';
 import { ExpenseGroupsService } from 'src/expense-groups/expense-groups.service';
 import { IncomeGroupsService } from 'src/income-groups/income-groups.service';
 import { ReportResponse } from './reports.types';
+import { renderReportTemplate } from './templates/report.template';
+import * as puppeteer from "puppeteer";
 
 @Injectable()
 export class ReportsService {
@@ -46,6 +48,17 @@ export class ReportsService {
         }
     }
 
+    async generatePdfReport(
+        userId: number,
+        options: GetReportQueryDto
+    ): Promise<Buffer> {
+        const report: ReportResponse = await this.getReport(userId, options);
+        const html = renderReportTemplate(report);
+        const pdf = await this.htmlToPdf(html);
+        
+        return pdf;
+    }
+
     private sum(items: {amount: number}[]): number {
         return items.reduce((sum,item) => sum + Number(item.amount), 0);
     }
@@ -65,4 +78,33 @@ export class ReportsService {
         }
         return result
     }
+
+    private async htmlToPdf(html: string): Promise<Buffer> {
+        const browser = await puppeteer.launch({
+            headless: true,          
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        });
+
+        const page = await browser.newPage();
+
+        await page.setContent(html, {
+            waitUntil: "networkidle0",
+        });
+
+        const pdfUint8 = await page.pdf({
+            format: "A4",
+            printBackground: true,
+            margin: {
+            top: "20px",
+            bottom: "20px",
+            left: "20px",
+            right: "20px",
+            },
+        });
+        const pdfBuffer = Buffer.from(pdfUint8);
+
+        await browser.close();
+        return pdfBuffer;
+    }
+
 }
