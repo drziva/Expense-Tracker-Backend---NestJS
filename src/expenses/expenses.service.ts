@@ -4,7 +4,7 @@ import { Expense } from './expenses.entity';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-returns.dto';
+import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-responses.dto';
 import { ExpenseQueryOptions } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 
@@ -19,12 +19,12 @@ export class ExpensesService {
     
     async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
         try {
-            const group = await this.groupRepo.findOne({ where: { id: dto.group_id, user_id:userId }});
+            const group = await this.groupRepo.findOne({ where: { id: dto.groupId, user_id:userId }});
             if (!group) throw new NotFoundException("Group not found");
             const expense = this.expenseRepo.create({
                 amount: dto.amount,
                 description: dto.description,
-                group_id:dto.group_id,
+                group_id:dto.groupId,
                 user_id: userId,
             });
             const savedExpense = await this.expenseRepo.save(expense);
@@ -122,12 +122,12 @@ export class ExpensesService {
                 if (!expense) {
                     throw new NotFoundException("Expense not found");
             }
-            if(dto.group_id) {
-                const group = await this.groupRepo.findOne({where:{id:dto.group_id, user_id:userId}})
+            if(dto.groupId) {
+                const group = await this.groupRepo.findOne({where:{id:dto.groupId, user_id:userId}})
                 if(!group){
                     throw new NotFoundException("Group not found");
                 }
-                expense.group_id = dto.group_id;
+                expense.group_id = dto.groupId;
             }
             expense.amount = dto.amount;
             expense.description = dto.description;

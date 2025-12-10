@@ -57,5 +57,5 @@ export class GetExpensesQueryDto {
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
-    group_id?: number;
+    groupId?: number;
 }

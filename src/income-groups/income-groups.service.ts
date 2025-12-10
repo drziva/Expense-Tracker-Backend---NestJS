@@ -4,10 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Like, Repository } from 'typeorm';
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
-import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-returns.dto';
+import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
 import { Income } from 'src/incomes/incomes.entity';
-import { IncomeResponse } from 'src/incomes/dto/incomes-returns.dto';
+import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
 import { IncomeGroupQueryOptions } from './income-groups.types';
 
 @Injectable()
@@ -15,11 +15,8 @@ export class IncomeGroupsService {
     constructor(
         @InjectRepository(IncomeGroup)
         private incomeGroupRepo: Repository<IncomeGroup>,
-
         @InjectRepository(Income)
         private incomeRepo: Repository<Income>,
-
-        private usersService: UsersService,
     ) {}
 
     async getGroupById(userId: number, groupId: number): Promise<IncomeGroupResponse> {
@@ -27,7 +24,6 @@ export class IncomeGroupsService {
         return this.toGroupResponse(group);
     }
 
-    
     async getIncomesForGroup(userId: number, groupId: number): Promise<IncomeResponse[]> {
         await this.validateGroup(userId,groupId);
 
@@ -41,8 +37,6 @@ export class IncomeGroupsService {
         userId: number,
         options: IncomeGroupQueryOptions
     ): Promise<GetIncomeGroupResponse> {
-        await this.validateUser(userId);
-
         const { search, sort, page = 1, limit = 20 } = options;
 
         const where: any = { user_id: userId };
@@ -89,10 +83,9 @@ export class IncomeGroupsService {
     }
 
     async createGroup(userId: number, dto: CreateIncomeGroupDto): Promise<IncomeGroupResponse> {
-        await this.validateUser(userId);
-
+        try {
         const exists = await this.incomeGroupRepo.findOne({
-        where: { name: dto.name, user_id: userId },
+            where: { name: dto.name, user_id: userId },
         });
 
         if (exists) {
@@ -100,14 +93,18 @@ export class IncomeGroupsService {
         }
 
         const group = this.incomeGroupRepo.create({
-        user_id: userId,
-        name: dto.name,
-        description: dto.description,
+            user_id: userId,
+            name: dto.name,
+            description: dto.description,
         });
 
         await this.incomeGroupRepo.save(group);
 
         return this.toGroupResponse(group);
+        } catch(error) {
+            console.error("Error creating income group: ", error);
+            throw error;
+        }
     }
 
     async updateGroup(
@@ -135,12 +132,13 @@ export class IncomeGroupsService {
         const updated = await this.incomeGroupRepo.save(group);
         return this.toGroupResponse(updated);
         } catch (error) {
-        console.error(error);
+        console.error("Error updating income group: ",error);
         throw error;
         }
     }
 
     async deleteGroup(userId: number, groupId: number): Promise<DeleteIncomeGroupResponse> {
+        try {        
         await this.validateGroup(userId, groupId);
 
         await this.incomeGroupRepo.delete({
@@ -149,6 +147,10 @@ export class IncomeGroupsService {
         });
 
         return { success: true, id: groupId };
+        } catch(error) {
+            console.error("Error deleting income group: ",error);
+            throw error;
+        }
     }
 
     private toGroupResponse(group: IncomeGroup): IncomeGroupResponse {
@@ -193,10 +195,4 @@ export class IncomeGroupsService {
         };
     }
 
-    private async validateUser(userId: number): Promise<void> {
-        const user = await this.usersService.findById(userId);
-        if (!user) {
-        throw new NotFoundException('User not found');
-        }
-    }
 }

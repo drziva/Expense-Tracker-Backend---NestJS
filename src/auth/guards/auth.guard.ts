@@ -1,13 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { IS_PUBLIC_KEY } from "../public-decorator";
+import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
       private jwtService: JwtService,
-      private reflector: Reflector
+      private reflector: Reflector,
+      private usersService: UsersService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,14 +35,20 @@ export class AuthGuard implements CanActivate {
 
     try {
         const user = await this.jwtService.verifyAsync(token);
+        const dbUser = await this.usersService.findById(user.sub);
+        if(!dbUser){
+          throw new NotFoundException('User does not exist in Database');
+        }
         request.user = {
-            sub: user.sub,
-            username: user.username,
-            email: user.email
+            sub: dbUser.id,
+            username: dbUser.username,
+            email: dbUser.email,
+            premium: dbUser.premium
         }
         return true;
     } catch (error) {
-        throw new UnauthorizedException();
+        console.error(error);
+        throw error;
     }
   }
 }

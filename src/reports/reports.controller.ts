@@ -4,7 +4,8 @@ import type { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { UserId } from 'src/auth/user-id.decorator';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
-import { ReportResponse } from './dto/reports-returns.dto';
+import { ReportResponse } from './dto/reports-responses.dto';
+import { User } from 'src/users/user.entity';
 
 @ApiTags('Reports')
 @ApiBearerAuth()
@@ -29,6 +30,31 @@ export class ReportsController {
         @Query() query: GetReportQueryDto
     ): Promise<ReportResponse> {
         return this.reportsService.getReport(userId, query);
+    }
+
+    @Get('email')
+    @ApiOperation({
+    summary: 'Send a financial report PDF to the authenticated user via email.',
+    })
+    @ApiOkResponse({
+    description: 'The report has been generated and sent to the user’s email.',
+    schema: {
+        type: 'object',
+        properties: {
+            success: { type: 'boolean', example: true },
+        },
+    },
+    })
+    @ApiResponse({
+    status: 404,
+    description: 'Thrown if the user is not found or no data exists for generating the report.',
+    })
+    async getEmail(
+        @UserId() userId: number,
+        @Query() query: GetReportQueryDto
+    ) {
+        await this.reportsService.sendReportEmail(userId, query);
+        return { success: true };
     }
 
     @Get('pdf')

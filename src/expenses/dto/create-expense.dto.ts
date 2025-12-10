@@ -26,5 +26,5 @@ export class CreateExpenseDto {
     })
     @Type(() => Number)
     @IsNumber()
-    group_id: number;
+    groupId: number;
 }

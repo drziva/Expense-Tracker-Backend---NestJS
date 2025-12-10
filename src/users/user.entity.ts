@@ -3,6 +3,7 @@ import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { Expense } from 'src/expenses/expenses.entity';
 import { Income } from 'src/incomes/incomes.entity';
 import { IncomeGroup } from 'src/income-groups/income-groups.entity';
+import { Reminder } from 'src/reminders/reminders.entity';
 
 @Entity("user")
 export class User {
@@ -18,6 +19,9 @@ export class User {
   @Column()
   email: string;
 
+  @Column({ type: 'boolean', default: false })
+  premium: boolean;
+
   @OneToMany(() => ExpenseGroup, group => group.user)
   expenseGroups: ExpenseGroup[];
 
@@ -29,4 +33,7 @@ export class User {
 
   @OneToMany(() => Income, income => income.user)
   incomes: Income[];
+
+  @OneToMany(() => Reminder, reminder => reminder.user)
+  reminders: Reminder[];
 }

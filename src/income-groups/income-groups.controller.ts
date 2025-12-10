@@ -13,8 +13,8 @@ import {
   DeleteIncomeGroupResponse,
   GetIncomeGroupResponse,
   IncomeGroupResponse
-} from './dto/income-groups-returns.dto';
-import { IncomeResponse } from 'src/incomes/dto/incomes-returns.dto';
+} from './dto/income-groups-responses.dto';
+import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
 
 @ApiTags('Income Groups')
 @ApiBearerAuth()

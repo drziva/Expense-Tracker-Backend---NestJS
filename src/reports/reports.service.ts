@@ -4,9 +4,12 @@ import { IncomesService } from 'src/incomes/incomes.service';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
 import { ExpenseGroupsService } from 'src/expense-groups/expense-groups.service';
 import { IncomeGroupsService } from 'src/income-groups/income-groups.service';
-import { ReportResponse } from './dto/reports-returns.dto';
+import { ReportResponse } from './dto/reports-responses.dto';
 import { renderReportTemplate } from './templates/report.template';
 import * as puppeteer from "puppeteer";
+import { EmailService } from 'src/email/email.service';
+import { UsersService } from 'src/users/users.service';
+import { TransactionForReport } from './dto/transaction-for-report.dto';
 
 @Injectable()
 export class ReportsService {
@@ -14,7 +17,9 @@ export class ReportsService {
         private expensesService: ExpensesService,
         private incomesService: IncomesService,
         private expenseGroupsService: ExpenseGroupsService,
-        private incomeGroupsService: IncomeGroupsService
+        private incomeGroupsService: IncomeGroupsService,
+        private emailService: EmailService,
+        private usersService: UsersService
     ) {}
 
     async getReport(userId: number, options: GetReportQueryDto): Promise<ReportResponse> {
@@ -34,6 +39,9 @@ export class ReportsService {
         const expenseGroupNames: Record<number,string> = await this.expenseGroupsService.getGroupsForUser(userId);
         const incomeGroupNames: Record<number,string> = await this.incomeGroupsService.getGroupsForUser(userId);
 
+        const incomesForReport: TransactionForReport[] = this.toReportFormat(incomes,incomeGroupNames);
+        const expensesForReport: TransactionForReport[] = this.toReportFormat(expenses,expenseGroupNames);
+
         const incomesByGroup = this.sumByGroup(incomes, incomeGroupNames);
         const expensesByGroup = this.sumByGroup(expenses, expenseGroupNames);
 
@@ -41,8 +49,8 @@ export class ReportsService {
             totalIncomes: totalIncomes,
             totalExpenses: totalExpenses,
             balance: balance,
-            incomes: incomes,
-            expenses: expenses,
+            incomes: incomesForReport,
+            expenses: expensesForReport,
             expensesByGroup: expensesByGroup,
             incomesByGroup: incomesByGroup
         }
@@ -57,6 +65,13 @@ export class ReportsService {
         const pdf = await this.htmlToPdf(html);
 
         return pdf;
+    } 
+
+    async sendReportEmail(userId: number, options: GetReportQueryDto): Promise<void> {
+        const user = (await this.usersService.findById(userId))!;
+        const pdf = await this.generatePdfReport(userId, options);
+
+        return this.emailService.sendFinancialReportEmail(user, pdf);
     }
 
     private sum(items: {amount: number}[]): number {
@@ -113,5 +128,15 @@ export class ReportsService {
         }
     }
 
-
+    private toReportFormat(transaction, groupNames): TransactionForReport[] {
+        const valuesForReport = transaction.map(transaction=>
+        ({
+            amount: transaction.amount,
+            description: transaction.description,
+            created_at:transaction.created_at,
+            group: groupNames[transaction.group_id]
+        })
+        )
+        return valuesForReport
+    }
 }
