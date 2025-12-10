@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe } from "@nestjs/common";
 import { CreateExpenseDto } from "./dto/create-expense.dto";
 import { ExpensesService } from "./expenses.service";
-import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from "./dto/expenses-returns.dto";
+import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from "./dto/expenses-responses.dto";
 import { UserId } from "src/auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from "@nestjs/swagger";

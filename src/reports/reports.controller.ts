@@ -4,7 +4,7 @@ import type { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { UserId } from 'src/auth/user-id.decorator';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
-import { ReportResponse } from './dto/reports-returns.dto';
+import { ReportResponse } from './dto/reports-responses.dto';
 import { User } from 'src/users/user.entity';
 
 @ApiTags('Reports')

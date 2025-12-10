@@ -9,7 +9,7 @@ import { UserId } from 'src/auth/user-id.decorator';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { PremiumGuard } from 'src/auth/guards/premium.guard';
-import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-returns.dto';
+import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-responses.dto';
 
 @ApiTags('Reminders')
 @ApiBearerAuth()

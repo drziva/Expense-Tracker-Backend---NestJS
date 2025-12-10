@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
+import { ReminderEnum } from '../reminders-types';
 
 export class CreateReminderDto {
   @ApiProperty({
     description: 'Reminder frequency',
-    enum: ['weekly', 'monthly'],
-    example: 'weekly',
+    enum: ReminderEnum,
+    example: ReminderEnum.WEEKLY,
   })
-  @IsEnum(['weekly', 'monthly'])
-  type: 'weekly' | 'monthly';
+  @IsEnum(ReminderEnum)
+  type: ReminderEnum;
 }

@@ -1,13 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { IS_PUBLIC_KEY } from "../public-decorator";
+import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
       private jwtService: JwtService,
-      private reflector: Reflector
+      private reflector: Reflector,
+      private usersService: UsersService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -39,9 +41,11 @@ export class AuthGuard implements CanActivate {
             email: user.email,
             premium: user.premium
         }
+        await this.usersService.findById(user.sub);
         return true;
     } catch (error) {
-        throw new UnauthorizedException();
+        console.error(error);
+        throw error;
     }
   }
 }

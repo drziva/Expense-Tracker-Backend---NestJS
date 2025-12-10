@@ -7,8 +7,8 @@ import { ExpenseGroupsService } from './expense-groups.service';
 import { GetGroupQueryDto } from './dto/get-expense-groups.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-returns.dto';
-import { ExpenseResponse } from 'src/expenses/dto/expenses-returns.dto';
+import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-responses.dto';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
 import { BudgetStatusDto } from './dto/budget-status.dto';
 
 

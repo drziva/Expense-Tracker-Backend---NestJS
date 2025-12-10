@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expense } from 'src/expenses/expenses.entity';
-import { Income } from 'src/incomes/incomes.entity';
+import { TransactionForReport } from './transaction-for-report.dto';
 
 export class ReportResponse {
   @ApiProperty({ example: 2500 })
@@ -12,11 +11,11 @@ export class ReportResponse {
   @ApiProperty({ example: 700 })
   balance: number;
 
-  @ApiProperty({ type: () => [Income] })
-  incomes: Income[];
+  @ApiProperty({ type: () => [TransactionForReport] })
+  incomes: TransactionForReport[];
 
-  @ApiProperty({ type: () => [Expense] })
-  expenses: Expense[];
+  @ApiProperty({ type: () => [TransactionForReport] })
+  expenses: TransactionForReport[];
 
   @ApiProperty({
     description: 'Summary of expenses grouped by group name',

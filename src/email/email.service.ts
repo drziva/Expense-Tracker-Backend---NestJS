@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Resend } from 'resend';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class EmailService {
@@ -32,7 +33,8 @@ export class EmailService {
             });
 
         } catch (error) {
-            throw new InternalServerErrorException('Failed to send email');
+            console.error("Error sending email: ", error)
+            throw error;
         }
     }
 
@@ -57,8 +59,29 @@ export class EmailService {
             ],
             });
         } catch (error) {
-            throw new InternalServerErrorException('Failed to send email with attachment');
+            console.error("Error sending email with attachment: ", error)
+            throw error;
         }
     }
 
+    async sendFinancialReportEmail(
+        user: User,
+        pdf: Buffer
+    ): Promise<void> {
+        const subject = "Your Financial Report -- VegaIT";
+
+        const html = `
+            <h1>Hi, ${user.username}!</h1>
+            <h2>Your report is ready</h2>
+            <p>See the attached PDF for more details.</p>
+        `;
+
+        return this.sendWithAttachment(
+            user.email,
+            subject,
+            html,
+            pdf,
+            `${user.username}_report.pdf`
+        );
+    }
 }

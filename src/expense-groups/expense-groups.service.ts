@@ -7,8 +7,8 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { GroupQueryOptions } from './expense-groups.types';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
-import { ExpenseResponse } from 'src/expenses/dto/expenses-returns.dto';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-returns.dto';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto.js';
+import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-responses.dto.js';
 
 @Injectable()
 export class ExpenseGroupsService {
@@ -36,7 +36,6 @@ export class ExpenseGroupsService {
     }
 
     async getFilteredGroups( userId: number, options: GroupQueryOptions): Promise<GetGroupResponse> {
-        await this.validateUser(userId);
         const where: any = { user_id: userId };
         const { search, sort, page = 1, limit = 20 } = options;
 
@@ -83,7 +82,6 @@ export class ExpenseGroupsService {
 
 
     async createGroup(userId: number, dto: CreateGroupDto): Promise<GroupResponse>{
-        await this.validateUser(userId);
         const groupExists = await this.expenseGroupRepo.findOne({where:{name:dto.name,user_id:userId}});
         if(groupExists) throw new ConflictException("Group with this name already exists");
 
@@ -98,6 +96,7 @@ export class ExpenseGroupsService {
 
         return this.toGroupResponse(group);
         } catch(error) {
+            console.error("Error creating expense group: ", error)
             throw error;
         }
     }       
@@ -120,7 +119,7 @@ export class ExpenseGroupsService {
             const updatedGroup = await this.expenseGroupRepo.save(group);
             return this.toGroupResponse(updatedGroup);
         } catch (error) {
-            console.error(error);
+            console.error("Error updating expense group: ", error);
             throw error;
         }
     }
@@ -135,7 +134,7 @@ export class ExpenseGroupsService {
             return { success: true, id: groupId };
 
         } catch (error) {
-            console.error(error);
+            console.error("Error deleting expense group: ", error);
             throw error;
         }
     } 
@@ -219,11 +218,6 @@ export class ExpenseGroupsService {
         }
 
         return group;
-    }
-
-    private async validateUser(userId: number): Promise<void> {
-        const user = await this.usersService.findById(userId);
-        if(!user) throw new NotFoundException(`User not found`);
     }
 
     private toExpenseResponse(expense: Expense): ExpenseResponse {

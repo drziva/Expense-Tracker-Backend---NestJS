@@ -1,4 +1,4 @@
-import { ReportResponse } from "../dto/reports-returns.dto";
+import { ReportResponse } from "../dto/reports-responses.dto";
 
 export function renderReportTemplate(report: ReportResponse): string {
   const money = (n: number) =>
@@ -136,7 +136,28 @@ export function renderReportTemplate(report: ReportResponse): string {
           )
           .join("")}
       </table>
+      <h2>Incomes List</h2>
+      <table>
+        <tr>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Group</th>
+        </tr>
 
+        ${report.incomes
+          .map(
+            (income) => `
+            <tr>
+              <td>${money(income.amount)}</td>
+              <td>${income.description || "-"}</td>
+              <td>${new Date(income.created_at).toLocaleDateString()}</td>
+              <td>${income.group}</td>
+            </tr>
+          `
+          )
+          .join("")}
+      </table>
       <h2>Expenses by Group</h2>
       <table>
         <tr><th>Group</th><th>Amount</th></tr>
@@ -146,6 +167,28 @@ export function renderReportTemplate(report: ReportResponse): string {
             <tr>
               <td>${group}</td>
               <td>${money(amount)}</td>
+            </tr>
+          `
+          )
+          .join("")}
+      </table>
+      <h2>Expenses List</h2>
+      <table>
+        <tr>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>Date</th>
+          <th>Group</th>
+        </tr>
+
+        ${report.expenses
+          .map(
+            (expense) => `
+            <tr>
+              <td>${money(expense.amount)}</td>
+              <td>${expense.description || "-"}</td>
+              <td>${new Date(expense.created_at).toLocaleDateString()}</td>
+              <td>${expense.group}</td>
             </tr>
           `
           )

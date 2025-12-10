@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { Income } from './incomes.entity';
 import { CreateIncomeDto } from './dto/create-income.dto';
-import { DeleteIncomeResponse, GetIncomeResponse, IncomeResponse } from './dto/incomes-returns.dto';
+import { DeleteIncomeResponse, GetIncomeResponse, IncomeResponse } from './dto/incomes-responses.dto';
 import { IncomeQueryOptions } from './incomes.types';
 import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 import { UpdateIncomeDto } from './dto/update-income.dto';
@@ -30,7 +30,7 @@ export class IncomesService {
             const savedIncome = await this.incomeRepo.save(income);
             return this.toIncomeResponse(savedIncome);
         } catch (error) {
-            console.error("Error creating income:", error);
+            console.error("Error creating group: ",error);
             throw error;
         }
     }
@@ -129,7 +129,7 @@ export class IncomesService {
             const updatedIncome = await this.incomeRepo.save(income);
             return this.toIncomeResponse(updatedIncome)
         } catch(error){
-            console.error(error);
+            console.error("Error updating income: ",error);
             throw error;
         }
     }
@@ -143,7 +143,7 @@ export class IncomesService {
                 id,
             };
         } catch (error) {
-            console.error("Error deleting income:", error);
+            console.error("Error deleting income: ",error);
             throw error;
         }
     }

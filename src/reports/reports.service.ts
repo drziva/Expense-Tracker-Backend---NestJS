@@ -4,11 +4,12 @@ import { IncomesService } from 'src/incomes/incomes.service';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
 import { ExpenseGroupsService } from 'src/expense-groups/expense-groups.service';
 import { IncomeGroupsService } from 'src/income-groups/income-groups.service';
-import { ReportResponse } from './dto/reports-returns.dto';
+import { ReportResponse } from './dto/reports-responses.dto';
 import { renderReportTemplate } from './templates/report.template';
 import * as puppeteer from "puppeteer";
 import { EmailService } from 'src/email/email.service';
 import { UsersService } from 'src/users/users.service';
+import { TransactionForReport } from './dto/transaction-for-report.dto';
 
 @Injectable()
 export class ReportsService {
@@ -38,6 +39,9 @@ export class ReportsService {
         const expenseGroupNames: Record<number,string> = await this.expenseGroupsService.getGroupsForUser(userId);
         const incomeGroupNames: Record<number,string> = await this.incomeGroupsService.getGroupsForUser(userId);
 
+        const incomesForReport: TransactionForReport[] = this.toReportFormat(incomes,incomeGroupNames);
+        const expensesForReport: TransactionForReport[] = this.toReportFormat(expenses,expenseGroupNames);
+
         const incomesByGroup = this.sumByGroup(incomes, incomeGroupNames);
         const expensesByGroup = this.sumByGroup(expenses, expenseGroupNames);
 
@@ -45,8 +49,8 @@ export class ReportsService {
             totalIncomes: totalIncomes,
             totalExpenses: totalExpenses,
             balance: balance,
-            incomes: incomes,
-            expenses: expenses,
+            incomes: incomesForReport,
+            expenses: expensesForReport,
             expensesByGroup: expensesByGroup,
             incomesByGroup: incomesByGroup
         }
@@ -63,21 +67,11 @@ export class ReportsService {
         return pdf;
     } 
 
-    async sendReportEmail(userId: number, options: GetReportQueryDto): Promise<void>{
-        const user = await this.usersService.findById(userId);
-        if(!user){
-            throw new NotFoundException("User was not found in the database")
-        }
-        const report = await this.generatePdfReport(userId, options);
+    async sendReportEmail(userId: number, options: GetReportQueryDto): Promise<void> {
+        const user = (await this.usersService.findById(userId))!;
+        const pdf = await this.generatePdfReport(userId, options);
 
-        return await this.emailService.sendWithAttachment(
-            user.email,
-            "Your Financial Report",
-            "<h1>Your report is ready</h1><p>See attached PDF.</p>",
-            report,
-            `${user.username}_report.pdf`
-
-        )
+        return this.emailService.sendFinancialReportEmail(user, pdf);
     }
 
     private sum(items: {amount: number}[]): number {
@@ -134,5 +128,15 @@ export class ReportsService {
         }
     }
 
-
+    private toReportFormat(transaction, groupNames): TransactionForReport[] {
+        const valuesForReport = transaction.map(transaction=>
+        ({
+            amount: transaction.amount,
+            description: transaction.description,
+            created_at:transaction.created_at,
+            group: groupNames[transaction.group_id]
+        })
+        )
+        return valuesForReport
+    }
 }

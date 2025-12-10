@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Reminder } from './reminders.entity';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
-import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-returns.dto';
+import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-responses.dto';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -17,10 +17,6 @@ export class RemindersService {
 
   async create(userId: number, dto: CreateReminderDto): Promise<ReminderResponse> {
     try {
-      const user = await this.usersService.findById(userId);
-      if (!user) {
-        throw new NotFoundException('User not found.');
-      }
       const reminder = this.reminderRepo.create({
         type: dto.type,
         user_id: userId,
@@ -30,6 +26,7 @@ export class RemindersService {
 
       return this.toReminderResponse(reminder);
     } catch(error){
+      console.error("Error creating reminder: ", error);
       throw error;
     }
   }
@@ -55,6 +52,7 @@ export class RemindersService {
 
       return this.toReminderResponse(reminder);
   } catch(error){
+      console.error("Error updating reminder: ", error);
       throw error
   }
 
@@ -73,6 +71,7 @@ export class RemindersService {
       
       return { success:true, id: id};}
     catch(error){
+      console.error("Error deleting reminder: ", error);
       throw error;
     }
   }
