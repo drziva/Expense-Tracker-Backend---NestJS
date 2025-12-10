@@ -9,12 +9,24 @@ export class ReminderResponse {
 
   @ApiProperty({ example: true })
   active: boolean;
-
+  
   @ApiProperty({ example: 5 })
   user_id: number;
 
   @ApiProperty({ example: '2025-01-01T12:00:00.000Z' })
   created_at: Date;
+
+  @ApiProperty({
+    example: 3, 
+    nullable:true
+  })
+  weekday: number | null;
+
+  @ApiProperty({
+    example: 23, 
+    nullable:true
+  })
+  day_of_month: number | null;  
 }
 
 export class DeleteReminderResponse {

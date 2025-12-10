@@ -5,20 +5,21 @@ import { Reminder } from './reminders.entity';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-responses.dto';
-import { UsersService } from 'src/users/users.service';
+import { ReminderEnum } from './reminders-types';
 
 @Injectable()
 export class RemindersService {
   constructor(
     @InjectRepository(Reminder)
     private reminderRepo: Repository<Reminder>,
-    private usersService: UsersService,
   ) {}
 
   async create(userId: number, dto: CreateReminderDto): Promise<ReminderResponse> {
     try {
       const reminder = this.reminderRepo.create({
         type: dto.type,
+        weekday: dto.type === ReminderEnum.WEEKLY ? dto.weekday : null,
+        day_of_month: dto.type === ReminderEnum.MONTHLY ? dto.day_of_month : null,
         user_id: userId,
       });
 
@@ -47,7 +48,16 @@ export class RemindersService {
         throw new NotFoundException('Reminder not found.');
       }
       reminder.active = dto.active;
-      reminder.type = dto.type;
+      reminder.type = dto.type; 
+      
+    if (dto.type === ReminderEnum.WEEKLY) {
+      reminder.weekday = dto.weekday ?? null;
+      reminder.day_of_month = null;
+    } else {
+      reminder.day_of_month = dto.day_of_month ?? null;
+      reminder.weekday = null;
+    }
+
       await this.reminderRepo.save(reminder);
 
       return this.toReminderResponse(reminder);
@@ -83,6 +93,8 @@ export class RemindersService {
       active: reminder.active,
       user_id: reminder.user_id,
       created_at: reminder.created_at,
+      day_of_month: reminder.day_of_month,
+      weekday: reminder.weekday
     };
   }
 

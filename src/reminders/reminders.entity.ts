@@ -1,16 +1,23 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, JoinColumn } from 'typeorm';
 import { User } from 'src/users/user.entity';
+import { ReminderEnum } from './reminders-types';
 
 @Entity('reminders')
 export class Reminder {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'int', nullable: true })
+  weekday: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  day_of_month: number | null;
+
   @Column({ 
     type: 'enum', 
-    enum: ['weekly', 'monthly'] 
+    enum: ReminderEnum 
   })
-  type: 'weekly' | 'monthly';
+  type: ReminderEnum;
 
   @Column({ default: true })
   active: boolean;

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
@@ -67,12 +67,12 @@ export class EmailService {
     async sendFinancialReportEmail(
         user: User,
         pdf: Buffer
-    ): Promise<void> {
+        ): Promise<void> {
         const subject = "Your Financial Report -- VegaIT";
 
         const html = `
             <h1>Hi, ${user.username}!</h1>
-            <h2>Your report is ready</h2>
+            <h2>Your financial report is ready</h2>
             <p>See the attached PDF for more details.</p>
         `;
 
