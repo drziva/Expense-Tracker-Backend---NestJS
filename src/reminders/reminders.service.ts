@@ -19,7 +19,7 @@ export class RemindersService {
       const reminder = this.reminderRepo.create({
         type: dto.type,
         weekday: dto.type === ReminderEnum.WEEKLY ? dto.weekday : null,
-        day_of_month: dto.type === ReminderEnum.MONTHLY ? dto.day_of_month : null,
+        day_of_month: dto.type === ReminderEnum.MONTHLY ? dto.dayOfMonth : null,
         user_id: userId,
       });
 
@@ -32,10 +32,14 @@ export class RemindersService {
     }
   }
 
-  async findAll(userId: number) {
-    return this.reminderRepo.find({
+  async findAll(userId: number): Promise<ReminderResponse[]> {
+    const reminders = await this.reminderRepo.find({
       where: { user_id: userId },
     });
+    if(reminders.length === 0){
+      throw new NotFoundException("No reminders were found")
+    }
+    return reminders.map(rem => this.toReminderResponse(rem))
   }
 
   async update(userId: number, id: number, dto: UpdateReminderDto) {
@@ -54,7 +58,7 @@ export class RemindersService {
       reminder.weekday = dto.weekday ?? null;
       reminder.day_of_month = null;
     } else {
-      reminder.day_of_month = dto.day_of_month ?? null;
+      reminder.day_of_month = dto.dayOfMonth ?? null;
       reminder.weekday = null;
     }
 
@@ -91,9 +95,9 @@ export class RemindersService {
       id: reminder.id,
       type: reminder.type,
       active: reminder.active,
-      user_id: reminder.user_id,
-      created_at: reminder.created_at,
-      day_of_month: reminder.day_of_month,
+      userId: reminder.user_id,
+      createdAt: reminder.created_at,
+      dayOfMonth: reminder.day_of_month,
       weekday: reminder.weekday
     };
   }

@@ -1,20 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ReminderEnum } from '../reminders-types';
 
 export class ReminderResponse {
   @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ enum: ['weekly', 'monthly'], example: 'weekly' })
-  type: 'weekly' | 'monthly';
+  @ApiProperty({ enum: ReminderEnum, example: ReminderEnum.MONTHLY })
+  type: ReminderEnum;
 
   @ApiProperty({ example: true })
   active: boolean;
   
   @ApiProperty({ example: 5 })
-  user_id: number;
+  userId: number;
 
   @ApiProperty({ example: '2025-01-01T12:00:00.000Z' })
-  created_at: Date;
+  createdAt: Date;
 
   @ApiProperty({
     example: 3, 
@@ -26,7 +27,7 @@ export class ReminderResponse {
     example: 23, 
     nullable:true
   })
-  day_of_month: number | null;  
+  dayOfMonth: number | null;  
 }
 
 export class DeleteReminderResponse {

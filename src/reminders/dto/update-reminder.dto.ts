@@ -36,5 +36,5 @@ export class UpdateReminderDto {
   @IsInt()
   @Min(1)
   @Max(31)
-  day_of_month?: number;
+  dayOfMonth?: number;
 }

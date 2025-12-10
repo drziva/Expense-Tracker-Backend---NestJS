@@ -34,7 +34,7 @@ export class AuthService {
         });
 
         const response: LoginResponse = {
-            access_token: token,
+            accessToken: token,
             user: {
                 id: user.id,
                 username: user.username,
@@ -69,7 +69,7 @@ export class AuthService {
         const token = await this.jwtService.signAsync(payload);
         
         const response: LoginResponse = {
-            access_token: token,
+            accessToken: token,
             user: {
                 id: payload.sub,
                 username: user.username,

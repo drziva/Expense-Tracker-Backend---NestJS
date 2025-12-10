@@ -4,10 +4,10 @@ export class LoginUserResponse {
   @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty({ example: 'nikola' })
+  @ApiProperty({ example: 'jocko' })
   username: string;
 
-  @ApiProperty({ example: 'nikola@example.com' })
+  @ApiProperty({ example: 'jocko@example.com' })
   email: string;
 
   @ApiProperty({ example: false })
@@ -19,7 +19,7 @@ export class LoginResponse {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     description: 'JWT access token'
   })
-  access_token: string;
+  accessToken: string;
 
   @ApiProperty({ type: () => LoginUserResponse })
   user: LoginUserResponse;

@@ -28,5 +28,5 @@ export class UpdateIncomeDto {
 
   @Type(() => Number)
   @IsNumber({}, { message: 'group_id must be a valid number' })
-  group_id: number;
+  groupId: number;
 }

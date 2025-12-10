@@ -19,12 +19,12 @@ export class IncomesService {
 
     async create(dto: CreateIncomeDto, userId: number): Promise<IncomeResponse> {
         try {
-            const group = await this.groupRepo.findOne({ where: { id: dto.group_id, user_id:userId }});
+            const group = await this.groupRepo.findOne({ where: { id: dto.groupId, user_id:userId }});
             if (!group) throw new NotFoundException("Group not found");
             const income = this.incomeRepo.create({
                 amount: dto.amount,
                 description: dto.description,
-                group_id:dto.group_id,
+                group_id:dto.groupId,
                 user_id: userId,
             });
             const savedIncome = await this.incomeRepo.save(income);
@@ -116,12 +116,12 @@ export class IncomesService {
                 if (!income) {
                     throw new NotFoundException("Income not found");
             }
-            if(dto.group_id) {
-                const group = await this.groupRepo.findOne({where:{id:dto.group_id, user_id:userId}})
+            if(dto.groupId) {
+                const group = await this.groupRepo.findOne({where:{id:dto.groupId, user_id:userId}})
                 if(!group){
                     throw new NotFoundException("Group not found");
                 }
-                income.group_id = dto.group_id;
+                income.group_id = dto.groupId;
             }
             income.amount = dto.amount;
             income.description = dto.description;
