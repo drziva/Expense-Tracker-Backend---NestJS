@@ -9,6 +9,7 @@ import { IncomesModule } from './incomes/incomes.module';
 import { IncomeGroupsModule } from './income-groups/income-groups.module';
 import { ReportsModule } from './reports/reports.module';
 import { RemindersModule } from './reminders/reminders.module';
+import { EmailModule } from './email/email.module';
 import config from './config';
 
 
@@ -38,7 +39,8 @@ import config from './config';
     IncomesModule,
     IncomeGroupsModule,
     ReportsModule,
-    RemindersModule
+    RemindersModule,
+    EmailModule
   ],
 })
 export class AppModule {}

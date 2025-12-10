@@ -7,6 +7,8 @@ import { IncomeGroupsService } from 'src/income-groups/income-groups.service';
 import { ReportResponse } from './dto/reports-returns.dto';
 import { renderReportTemplate } from './templates/report.template';
 import * as puppeteer from "puppeteer";
+import { EmailService } from 'src/email/email.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ReportsService {
@@ -14,7 +16,9 @@ export class ReportsService {
         private expensesService: ExpensesService,
         private incomesService: IncomesService,
         private expenseGroupsService: ExpenseGroupsService,
-        private incomeGroupsService: IncomeGroupsService
+        private incomeGroupsService: IncomeGroupsService,
+        private emailService: EmailService,
+        private usersService: UsersService
     ) {}
 
     async getReport(userId: number, options: GetReportQueryDto): Promise<ReportResponse> {
@@ -57,6 +61,23 @@ export class ReportsService {
         const pdf = await this.htmlToPdf(html);
 
         return pdf;
+    } 
+
+    async sendReportEmail(userId: number, options: GetReportQueryDto): Promise<void>{
+        const user = await this.usersService.findById(userId);
+        if(!user){
+            throw new NotFoundException("User was not found in the database")
+        }
+        const report = await this.generatePdfReport(userId, options);
+
+        return await this.emailService.sendWithAttachment(
+            user.email,
+            "Your Financial Report",
+            "<h1>Your report is ready</h1><p>See attached PDF.</p>",
+            report,
+            `${user.username}_report.pdf`
+
+        )
     }
 
     private sum(items: {amount: number}[]): number {

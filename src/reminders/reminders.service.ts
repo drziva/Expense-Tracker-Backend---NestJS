@@ -2,10 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reminder } from './reminders.entity';
-import { UsersService } from 'src/users/users.service';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-returns.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RemindersService {

@@ -8,5 +8,9 @@ export default () => ({
   },
   jwt: {
     secret: process.env.JWT_SECRET
-  }
+  },
+  email: {
+    apiKey: process.env.RESEND_API_KEY,
+    from: process.env.EMAIL_FROM,
+  },
 });
