@@ -35,13 +35,16 @@ export class AuthGuard implements CanActivate {
 
     try {
         const user = await this.jwtService.verifyAsync(token);
-        request.user = {
-            sub: user.sub,
-            username: user.username,
-            email: user.email,
-            premium: user.premium
+        const dbUser = await this.usersService.findById(user.sub);
+        if(!dbUser){
+          throw new NotFoundException('User does not exist in Database');
         }
-        await this.usersService.findById(user.sub);
+        request.user = {
+            sub: dbUser.id,
+            username: dbUser.username,
+            email: dbUser.email,
+            premium: dbUser.premium
+        }
         return true;
     } catch (error) {
         console.error(error);
