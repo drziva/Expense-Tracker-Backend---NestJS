@@ -84,4 +84,25 @@ export class EmailService {
             `${user.username}_report.pdf`
         );
     }
+
+        async sendReminderReportEmail(
+            user: User,
+            pdf: Buffer
+        ): Promise<void> {
+            const subject = "Your recurring spending report";
+
+            const html = `
+                <h1>Hi, ${user.username}!</h1>
+                <h2>Your reccuring spending report is ready</h2>
+                <p>See the attached PDF for more details.</p>
+            `;
+
+            return this.sendWithAttachment(
+                user.email,
+                subject,
+                html,
+                pdf,
+                `${user.username}_report.pdf`
+            );
+        }
 }

@@ -6,12 +6,18 @@ import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-responses.dto';
 import { ReminderEnum } from './reminders-types';
+import { ReportsService } from 'src/reports/reports.service';
+import { UsersService } from 'src/users/users.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class RemindersService {
   constructor(
     @InjectRepository(Reminder)
     private reminderRepo: Repository<Reminder>,
+    private reportsService: ReportsService,
+    private usersService: UsersService,
+    private emailService: EmailService
   ) {}
 
   async create(userId: number, dto: CreateReminderDto): Promise<ReminderResponse> {
@@ -27,7 +33,7 @@ export class RemindersService {
 
       return this.toReminderResponse(reminder);
     } catch(error){
-      console.error("Error creating reminder: ", error);
+        console.error("Error creating reminder: ", error);
       throw error;
     }
   }
@@ -88,6 +94,13 @@ export class RemindersService {
       console.error("Error deleting reminder: ", error);
       throw error;
     }
+  }
+
+  async sendReminderReportEmail(userId: number, from: Date, to: Date) {
+      const user = (await this.usersService.findById(userId))!;
+      const pdf = await this.reportsService.generateReminderPdf(userId, from, to);
+
+      return this.emailService.sendReminderReportEmail(user, pdf);
   }
 
   private toReminderResponse(reminder: Reminder): ReminderResponse {

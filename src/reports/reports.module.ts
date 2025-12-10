@@ -18,6 +18,7 @@ import { UsersModule } from 'src/users/users.module';
     UsersModule
   ],
   controllers: [ReportsController],
-  providers: [ReportsService]
+  providers: [ReportsService],
+  exports: [ReportsService]
 })
 export class ReportsModule {}

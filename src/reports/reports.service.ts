@@ -10,6 +10,8 @@ import * as puppeteer from "puppeteer";
 import { EmailService } from 'src/email/email.service';
 import { UsersService } from 'src/users/users.service';
 import { TransactionForReport } from './dto/transaction-for-report.dto';
+import { ReminderReport } from './reports.types';
+import { renderReminderReportTemplate } from './templates/reminder-report.template';
 
 @Injectable()
 export class ReportsService {
@@ -56,6 +58,42 @@ export class ReportsService {
         }
     }
 
+    async getReminderReport(
+        userId: number,
+        from: Date,
+        to:Date
+    ): Promise<ReminderReport> {
+        const expenses = await this.expensesService.getForReport(userId,from,to);
+        if(expenses.length === 0){
+            throw new NotFoundException("No expenses were found for the user");
+        }
+        const totalSpent = this.sum(expenses);
+        const expenseGroupNames: Record<number,string> = await this.expenseGroupsService.getGroupsForUser(userId);
+        const expensesForReport = this.toReportFormat(expenses,expenseGroupNames);
+        const expensesTotalsByGroup = this.sumByGroup(expenses,expenseGroupNames);
+
+        const groups = await this.expenseGroupsService.findAll(userId);
+        const groupSummary = groups.map(group => {
+            const spent = expensesTotalsByGroup[group.name] ?? 0;
+            const budget = group.monthly_budget_cap ?? null;
+            const difference = budget != null ? budget - spent : null;
+            return {
+                groupName: group.name,
+                budget,
+                spent,
+                difference,
+            };
+        });
+        return {
+            totalSpent: totalSpent,
+            expenses: expensesForReport,
+            expenseTotals: expensesTotalsByGroup,
+            from: from,
+            to: to,
+            groupSummary
+        }
+    }
+
     async generatePdfReport(
         userId: number,
         options: GetReportQueryDto
@@ -66,6 +104,12 @@ export class ReportsService {
 
         return pdf;
     } 
+
+    async generateReminderPdf(userId: number, from: Date, to: Date): Promise<Buffer> {
+        const data = await this.getReminderReport(userId, from, to);
+        const html = renderReminderReportTemplate(data);
+        return this.htmlToPdf(html);
+    }
 
     async sendReportEmail(userId: number, options: GetReportQueryDto): Promise<void> {
         const user = (await this.usersService.findById(userId))!;

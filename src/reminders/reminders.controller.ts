@@ -1,22 +1,22 @@
-import { 
-  Body, Controller, Post, Get, Put, Delete, Param, ParseIntPipe, UseGuards 
-} from '@nestjs/common';
-import { 
-  ApiBearerAuth, ApiOperation, ApiTags, ApiOkResponse, ApiCreatedResponse 
-} from '@nestjs/swagger';
+import { Body, Controller, Post, Get, Put, Delete, Param, ParseIntPipe, UseGuards, } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { RemindersService } from './reminders.service';
 import { UserId } from 'src/auth/user-id.decorator';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { PremiumGuard } from 'src/auth/guards/premium.guard';
 import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-responses.dto';
+import { ReportsService } from 'src/reports/reports.service';
+
+
 
 @ApiTags('Reminders')
 @ApiBearerAuth()
 @UseGuards(PremiumGuard)
 @Controller('reminders')
 export class RemindersController {
-  constructor(private remindersService: RemindersService) {}
+  constructor(private remindersService: RemindersService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new reminder (Premium only)' })

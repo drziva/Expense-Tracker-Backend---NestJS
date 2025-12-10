@@ -4,9 +4,17 @@ import { RemindersService } from './reminders.service';
 import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Reminder } from './reminders.entity';
+import { ReportsModule } from 'src/reports/reports.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Reminder]),UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Reminder]),
+    UsersModule,
+    ReportsModule,
+    UsersModule,
+    EmailModule
+  ],
   providers: [RemindersService],
   controllers: [RemindersController]
 })

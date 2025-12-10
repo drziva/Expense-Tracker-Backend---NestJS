@@ -199,6 +199,10 @@ export class ExpenseGroupsService {
         return groupNames;
     }
 
+    async findAll(userId: number) {
+        return await this.expenseGroupRepo.find({where:{user_id: userId}});
+    }
+
     private toGroupResponse(expenseGroup: ExpenseGroup): GroupResponse {
         return {
             id: expenseGroup.id,
