@@ -19,7 +19,7 @@ export class User {
   @Column()
   email: string;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: false })
   budget_cap_notifications: boolean
 
   @Column({ type: 'boolean', default: false })

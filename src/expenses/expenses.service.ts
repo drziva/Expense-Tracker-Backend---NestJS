@@ -9,6 +9,7 @@ import { ExpenseQueryOptions } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { UsersService } from 'src/users/users.service';
 import { EmailService } from 'src/email/email.service';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class ExpensesService {
@@ -33,57 +34,24 @@ export class ExpensesService {
                 group_id: dto.groupId,
                 user_id: userId,
             });
-            
             const user = await this.usersService.findById(userId);
-            if (!user?.premium || !user?.budget_cap_notifications) {
+            if (!user?.premium || !user?.budget_cap_notifications || group.monthly_budget_cap === null) {
                 const saved = await this.expenseRepo.save(expense);
                 return this.toExpenseResponse(saved);
             }
-            const startOfMonth = new Date();
-            startOfMonth.setDate(1);
-            startOfMonth.setHours(0,0,0,0);
-
-            const totalBefore = await this.expenseRepo.sum("amount", {
-                user_id: userId,
-                group_id: dto.groupId,
-                created_at: MoreThanOrEqual(startOfMonth)
-            }) ?? 0;
-
-            const totalAfter = totalBefore + dto.amount;
-            const savedExpense = await this.expenseRepo.save(expense);
-            if (
-                group.monthly_budget_cap !== null &&
-                totalBefore < group.monthly_budget_cap &&
-                totalAfter > group.monthly_budget_cap
-            ) {
-                const now = new Date();
-                const lastSent = group.last_budget_alert;
-
-                const sentThisMonth =
-                    lastSent &&
-                    lastSent.getFullYear() === now.getFullYear() &&
-                    lastSent.getMonth() === now.getMonth();
-
-                if (!sentThisMonth) {
-                    await this.emailService.sendBudgetCapAlert(user, group, totalAfter);
-                    group.last_budget_alert = now;
-                    await this.groupRepo.save(group);
-                }
-            }
-            return this.toExpenseResponse(savedExpense);
-
+            await this.checkBudgetCap(user,dto,group);
+            const saved = await this.expenseRepo.save(expense);
+            return this.toExpenseResponse(saved);
         } catch (error) {
             console.error("Error creating expense:", error);
             throw error;
         }
     }
 
-
-
     async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};
         const { from, to, min, max, sort, page = 1, limit = 20, search, group_id } = options;
-        //FilteringD
+        //Filtering
         if (group_id !== undefined) {
             where.group_id = group_id;
         }
@@ -195,6 +163,35 @@ export class ExpensesService {
             where.created_at = LessThanOrEqual(to);
         }
         return await this.expenseRepo.find({where});
+    }
+    
+    private async checkBudgetCap(user: User,dto: CreateExpenseDto, group: ExpenseGroup): Promise<void> {
+        const now = new Date();
+            const lastSent = group.last_budget_alert;
+            const sentThisMonth =
+                lastSent &&
+                lastSent.getFullYear() === now.getFullYear() &&
+                lastSent.getMonth() === now.getMonth();
+        if(!sentThisMonth) {
+            const startOfMonth = new Date();
+            startOfMonth.setDate(1);
+            startOfMonth.setHours(0,0,0,0);
+
+            const totalBefore = await this.expenseRepo.sum("amount", {
+                user_id: user.id,
+                group_id: dto.groupId,
+                created_at: MoreThanOrEqual(startOfMonth)
+            }) ?? 0;
+            const totalAfter = totalBefore + dto.amount;
+            if (
+                totalBefore < group.monthly_budget_cap! &&
+                totalAfter > group.monthly_budget_cap!
+            ) {
+                await this.emailService.sendBudgetCapAlert(user, group, totalAfter);
+                group.last_budget_alert = now;
+                await this.groupRepo.save(group);
+            }
+        }
     }
 
     private async getAllExpenses(userId: number): Promise<ExpenseResponse[]> {
