@@ -5,13 +5,19 @@ import { ReportsService } from './reports.service';
 import { UserId } from 'src/auth/user-id.decorator';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
 import { ReportResponse } from './dto/reports-responses.dto';
-import { User } from 'src/users/user.entity';
+import { GetExpensesQueryDto } from 'src/expenses/dto/get-expenses-query.dto';
+import { ExpensesService } from 'src/expenses/expenses.service';
+import { IncomesService } from 'src/incomes/incomes.service';
 
 @ApiTags('Reports')
 @ApiBearerAuth()
 @Controller('reports')
 export class ReportsController {
-    constructor(private reportsService: ReportsService) {}
+    constructor(
+        private readonly reportsService: ReportsService,
+        private readonly expensesService: ExpensesService,
+        private readonly incomesService: IncomesService
+    ) {}
 
     @Get()
     @ApiOperation({
@@ -87,6 +93,42 @@ export class ReportsController {
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': 'attachment; filename=report.pdf',
+        });
+
+        res.send(pdf);
+    }
+
+    @Get("expenses/pdf")
+    @ApiOperation({ summary: "Export filtered expenses as PDF" })
+    async exportExpensesPdf(
+        @UserId() userId: number,
+        @Query() query: GetExpensesQueryDto,
+        @Res() res: Response,
+    ) {
+        const expenses = await this.expensesService.getFilteredForPdf(userId, query);
+        const pdf = await this.reportsService.generateTransactionTablePdf(expenses, "expense");
+
+        res.set({
+            "Content-Type": "application/pdf",
+            "Content-Disposition": "attachment; filename=expenses.pdf",
+        });
+
+        res.send(pdf);
+    }
+
+    @Get("incomes/pdf")
+    @ApiOperation({ summary: "Export filtered expenses as PDF" })
+    async exportIncomesPdf(
+        @UserId() userId: number,
+        @Query() query: GetExpensesQueryDto,
+        @Res() res: Response,
+    ) {
+        const incomes = await this.incomesService.getFilteredForPdf(userId, query);
+        const pdf = await this.reportsService.generateTransactionTablePdf(incomes, "income");
+
+        res.set({
+            "Content-Type": "application/pdf",
+            "Content-Disposition": "attachment; filename=incomes.pdf",
         });
 
         res.send(pdf);

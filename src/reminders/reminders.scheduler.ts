@@ -9,13 +9,12 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RemindersScheduler {
-  private readonly logger = new Logger(RemindersScheduler.name);
-
   constructor(
     @InjectRepository(Reminder)
-    private reminderRepo: Repository<Reminder>,
-    private remindersService: RemindersService, 
-    private usersService: UsersService
+    private readonly reminderRepo: Repository<Reminder>,
+    private readonly remindersService: RemindersService, 
+    private readonly usersService: UsersService,
+    private readonly logger: Logger
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_8AM)
@@ -66,7 +65,8 @@ export class RemindersScheduler {
       from = new Date(today);
       from.setDate(today.getDate() - 7);
     } else {
-      from = new Date(today.getFullYear(), today.getMonth(), 1);
+      from = new Date(today);
+      from.setDate(today.getDate() - 30)
     }
 
     await this.remindersService.sendReminderReportEmail(

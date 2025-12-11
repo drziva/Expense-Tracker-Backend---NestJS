@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe } from "@nestjs/common";
+import { Controller, Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe, Res } from "@nestjs/common";
 import { CreateExpenseDto } from "./dto/create-expense.dto";
 import { ExpensesService } from "./expenses.service";
 import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from "./dto/expenses-responses.dto";
@@ -6,7 +6,6 @@ import { UserId } from "src/auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from "@nestjs/swagger";
 import { GetExpensesQueryDto } from "./dto/get-expenses-query.dto";
-import { EmailService } from "src/email/email.service";
 
 @ApiBearerAuth()
 @Controller("expenses")
@@ -34,6 +33,16 @@ export class ExpensesController {
       { ...rest, page: pageNum, limit: limitNum }
     );
   }
+
+  @Get("export/pdf")
+  @ApiOperation({ summary: "Export filtered expenses as a PDF table" })
+  @ApiOkResponse({
+    description: "PDF generated successfully",
+    schema: {
+      type: "string",
+      format: "binary"
+    }
+  })
 
   @Get("total")
   @ApiOperation({ summary: "Get the total sum of all expenses for the user" })

@@ -12,16 +12,19 @@ import { UsersService } from 'src/users/users.service';
 import { TransactionForReport } from './dto/transaction-for-report.dto';
 import { ReminderReport } from './reports.types';
 import { renderReminderReportTemplate } from './templates/reminder-report.template';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
+import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
+import { renderTransactionTableTemplate } from './templates/transaction-table.template';
 
 @Injectable()
 export class ReportsService {
     constructor(
-        private expensesService: ExpensesService,
-        private incomesService: IncomesService,
-        private expenseGroupsService: ExpenseGroupsService,
-        private incomeGroupsService: IncomeGroupsService,
-        private emailService: EmailService,
-        private usersService: UsersService
+        private readonly expensesService: ExpensesService,
+        private readonly incomesService: IncomesService,
+        private readonly expenseGroupsService: ExpenseGroupsService,
+        private readonly incomeGroupsService: IncomeGroupsService,
+        private readonly emailService: EmailService,
+        private readonly usersService: UsersService
     ) {}
 
     async getReport(userId: number, options: GetReportQueryDto): Promise<ReportResponse> {
@@ -108,6 +111,11 @@ export class ReportsService {
     async generateReminderPdf(userId: number, from: Date, to: Date): Promise<Buffer> {
         const data = await this.getReminderReport(userId, from, to);
         const html = renderReminderReportTemplate(data);
+        return this.htmlToPdf(html);
+    }
+
+    async generateTransactionTablePdf(transactions: ExpenseResponse[] | IncomeResponse[], type:string) {
+        const html = renderTransactionTableTemplate(transactions, type);
         return this.htmlToPdf(html);
     }
 

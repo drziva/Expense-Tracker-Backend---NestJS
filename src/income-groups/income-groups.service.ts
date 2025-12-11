@@ -14,9 +14,9 @@ import { IncomeGroupQueryOptions } from './income-groups.types';
 export class IncomeGroupsService {
     constructor(
         @InjectRepository(IncomeGroup)
-        private incomeGroupRepo: Repository<IncomeGroup>,
+        private readonly incomeGroupRepo: Repository<IncomeGroup>,
         @InjectRepository(Income)
-        private incomeRepo: Repository<Income>,
+        private readonly incomeRepo: Repository<Income>,
     ) {}
 
     async getGroupById(userId: number, groupId: number): Promise<IncomeGroupResponse> {

@@ -14,10 +14,10 @@ import { EmailService } from 'src/email/email.service';
 export class RemindersService {
   constructor(
     @InjectRepository(Reminder)
-    private reminderRepo: Repository<Reminder>,
-    private reportsService: ReportsService,
-    private usersService: UsersService,
-    private emailService: EmailService
+    private readonly reminderRepo: Repository<Reminder>,
+    private readonly reportsService: ReportsService,
+    private readonly usersService: UsersService,
+    private readonly emailService: EmailService
   ) {}
 
   async create(userId: number, dto: CreateReminderDto): Promise<ReminderResponse> {

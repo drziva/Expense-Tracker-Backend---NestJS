@@ -14,10 +14,9 @@ import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } fr
 export class ExpenseGroupsService {
     constructor(
         @InjectRepository(ExpenseGroup)
-        private expenseGroupRepo: Repository<ExpenseGroup>,
+        private readonly expenseGroupRepo: Repository<ExpenseGroup>,
         @InjectRepository(Expense)
-        private expenseRepo: Repository<Expense>,
-        private usersService: UsersService,
+        private readonly expenseRepo: Repository<Expense>
     ){}
 
     async getGroupById(userId: number, groupId: number): Promise<GroupResponse>{

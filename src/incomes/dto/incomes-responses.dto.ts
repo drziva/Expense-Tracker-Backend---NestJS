@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class DeleteIncomeResponse {
   @ApiProperty({ example: true })
@@ -23,6 +23,9 @@ export class IncomeResponse {
 
   @ApiProperty({ example: 2 })
   groupId: number;
+  
+  @ApiPropertyOptional({ example: 'Employment'})
+  groupName?: string;
 }
 
 export class GetIncomeResponse {

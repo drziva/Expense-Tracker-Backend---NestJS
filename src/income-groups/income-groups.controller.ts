@@ -1,6 +1,4 @@
-import { 
-  Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query 
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { UserId } from 'src/auth/user-id.decorator';
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
 import { IncomeGroupsService } from './income-groups.service';
@@ -9,18 +7,14 @@ import {
   ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse 
 } from '@nestjs/swagger';
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
-import {
-  DeleteIncomeGroupResponse,
-  GetIncomeGroupResponse,
-  IncomeGroupResponse
-} from './dto/income-groups-responses.dto';
+import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
 import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
 
 @ApiTags('Income Groups')
 @ApiBearerAuth()
 @Controller('income-groups')
 export class IncomeGroupsController {
-  constructor(private incomeGroupsService: IncomeGroupsService) {}
+  constructor(private readonly incomeGroupsService: IncomeGroupsService) {}
 
   @ApiOperation({ summary: 'Get all income groups for the user with filtering, sorting, and pagination.' })
   @ApiOkResponse({

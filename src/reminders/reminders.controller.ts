@@ -6,16 +6,14 @@ import { CreateReminderDto } from './dto/create-reminder.dto';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { PremiumGuard } from 'src/auth/guards/premium.guard';
 import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-responses.dto';
-import { ReportsService } from 'src/reports/reports.service';
-
-
 
 @ApiTags('Reminders')
 @ApiBearerAuth()
 @UseGuards(PremiumGuard)
 @Controller('reminders')
 export class RemindersController {
-  constructor(private remindersService: RemindersService,
+  constructor( 
+    private readonly remindersService: RemindersService 
   ) {}
 
   @Post()

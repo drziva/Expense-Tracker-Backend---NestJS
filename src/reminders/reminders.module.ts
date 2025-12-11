@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { RemindersController } from './reminders.controller';
 import { RemindersService } from './reminders.service';
 import { UsersModule } from 'src/users/users.module';
@@ -16,7 +16,14 @@ import { RemindersScheduler } from './reminders.scheduler';
     UsersModule,
     EmailModule
   ],
-  providers: [RemindersService, RemindersScheduler],
+  providers: [
+    RemindersService,
+    RemindersScheduler,
+    {
+      provide: Logger,
+      useValue: new Logger('AppLogger'),
+    },
+  ],
   controllers: [RemindersController]
 })
 export class RemindersModule {}
