@@ -13,10 +13,8 @@ import { EmailModule } from 'src/email/email.module';
     TypeOrmModule.forFeature([Expense, ExpenseGroup]),
     UsersModule,
     ExpenseGroupsModule,
-    UsersModule,
     EmailModule
   ],
-  
   controllers: [ExpensesController],
   providers: [ExpensesService],
   exports: [ExpensesService]

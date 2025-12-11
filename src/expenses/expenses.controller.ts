@@ -34,16 +34,6 @@ export class ExpensesController {
     );
   }
 
-  @Get("export/pdf")
-  @ApiOperation({ summary: "Export filtered expenses as a PDF table" })
-  @ApiOkResponse({
-    description: "PDF generated successfully",
-    schema: {
-      type: "string",
-      format: "binary"
-    }
-  })
-
   @Get("total")
   @ApiOperation({ summary: "Get the total sum of all expenses for the user" })
   @ApiOkResponse({

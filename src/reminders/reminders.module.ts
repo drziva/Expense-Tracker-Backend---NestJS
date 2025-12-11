@@ -19,10 +19,7 @@ import { RemindersScheduler } from './reminders.scheduler';
   providers: [
     RemindersService,
     RemindersScheduler,
-    {
-      provide: Logger,
-      useValue: new Logger('AppLogger'),
-    },
+    Logger,
   ],
   controllers: [RemindersController]
 })
