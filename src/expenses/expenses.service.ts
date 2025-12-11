@@ -7,6 +7,8 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-responses.dto';
 import { ExpenseQueryOptions } from './expenses.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
+import { UsersService } from 'src/users/users.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class ExpensesService {
@@ -15,25 +17,68 @@ export class ExpensesService {
         private expenseRepo: Repository<Expense>,
         @InjectRepository(ExpenseGroup)
         private groupRepo: Repository<ExpenseGroup>,
+        private usersService: UsersService,
+        private emailService: EmailService
     ){}
-    
+        
     async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
         try {
-            const group = await this.groupRepo.findOne({ where: { id: dto.groupId, user_id:userId }});
+            const group = await this.groupRepo.findOne({
+                where: { id: dto.groupId, user_id: userId }
+            });
             if (!group) throw new NotFoundException("Group not found");
             const expense = this.expenseRepo.create({
                 amount: dto.amount,
                 description: dto.description,
-                group_id:dto.groupId,
+                group_id: dto.groupId,
                 user_id: userId,
             });
+            
+            const user = await this.usersService.findById(userId);
+            if (!user?.premium || !user?.budget_cap_notifications) {
+                const saved = await this.expenseRepo.save(expense);
+                return this.toExpenseResponse(saved);
+            }
+            const startOfMonth = new Date();
+            startOfMonth.setDate(1);
+            startOfMonth.setHours(0,0,0,0);
+
+            const totalBefore = await this.expenseRepo.sum("amount", {
+                user_id: userId,
+                group_id: dto.groupId,
+                created_at: MoreThanOrEqual(startOfMonth)
+            }) ?? 0;
+
+            const totalAfter = totalBefore + dto.amount;
             const savedExpense = await this.expenseRepo.save(expense);
+            if (
+                group.monthly_budget_cap !== null &&
+                totalBefore < group.monthly_budget_cap &&
+                totalAfter > group.monthly_budget_cap
+            ) {
+                const now = new Date();
+                const lastSent = group.last_budget_alert;
+
+                const sentThisMonth =
+                    lastSent &&
+                    lastSent.getFullYear() === now.getFullYear() &&
+                    lastSent.getMonth() === now.getMonth();
+
+                if (!sentThisMonth) {
+                    await this.emailService.sendBudgetCapAlert(user, group, totalAfter);
+                    group.last_budget_alert = now;
+                    await this.groupRepo.save(group);
+                }
+            }
             return this.toExpenseResponse(savedExpense);
+
         } catch (error) {
             console.error("Error creating expense:", error);
             throw error;
         }
     }
+
+
 
     async getFilteredExpenses(userId: number, options: ExpenseQueryOptions): Promise<GetExpenseResponse> {
         const where: any = { user_id: userId};

@@ -37,5 +37,5 @@ export class Expense {
   @ManyToOne(() => ExpenseGroup, group => group.expenses, { onDelete: "CASCADE" })
   @JoinColumn({ name: "group_id" })
   group: ExpenseGroup;
-
+  
 }

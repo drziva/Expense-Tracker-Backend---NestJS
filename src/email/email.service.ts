@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
+import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 
 @Injectable()
 export class EmailService {
@@ -104,5 +105,40 @@ export class EmailService {
                 pdf,
                 `${user.username}_report.pdf`
             );
+        }
+
+        async sendBudgetCapAlert(
+            user: User,
+            group: ExpenseGroup,
+            totalAfter: number
+        ) {
+            const subject = "Budget cap exceeded";
+
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2 style="color: #d9534f;">Budget Cap Exceeded</h2>
+                    <p>Hi ${user.username},</p>
+
+                    <p>
+                        You've exceeded the monthly budget cap for the 
+                        <strong>${group.name}</strong> group.
+                    </p>
+
+                    <p>
+                        <strong>Budget cap:</strong> ${group.monthly_budget_cap} €<br/>
+                        <strong>Current total:</strong> ${totalAfter.toFixed(2)} €
+                    </p>
+
+                    <p>
+                        Consider reviewing your recent expenses or adjusting your budget 
+                        to stay on track for the rest of the month.
+                    </p>
+
+                    <p style="margin-top: 30px; color: #6c757d;">
+                        This is an automated notification from your VegaIT Expense Tracker.
+                    </p>
+                </div>
+            `;
+            return this.send(user.email,subject,html);
         }
 }

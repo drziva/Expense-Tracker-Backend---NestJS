@@ -26,6 +26,9 @@ export class ExpenseGroup {
     @OneToMany(() => Expense, expense => expense.group)
     expenses: Expense[];
 
+    @Column({ type: 'datetime', nullable: true })
+    last_budget_alert: Date | null;
+
     @CreateDateColumn()
     created_at: Date;
 

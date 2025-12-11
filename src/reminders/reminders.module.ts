@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Reminder } from './reminders.entity';
 import { ReportsModule } from 'src/reports/reports.module';
 import { EmailModule } from 'src/email/email.module';
+import { RemindersScheduler } from './reminders.scheduler';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { EmailModule } from 'src/email/email.module';
     UsersModule,
     EmailModule
   ],
-  providers: [RemindersService],
+  providers: [RemindersService, RemindersScheduler],
   controllers: [RemindersController]
 })
 export class RemindersModule {}
