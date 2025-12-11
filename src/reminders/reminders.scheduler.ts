@@ -40,39 +40,56 @@ export class RemindersScheduler {
       }
       if (reminder.type === ReminderEnum.WEEKLY) {
         if (reminder.weekday === weekdayToday) {
-          await this.triggerReminder(reminder);
+          await this.triggerReminder(reminder, weekdayToday);
         }
       }
       else if (reminder.type === ReminderEnum.MONTHLY) {
         const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
         const targetDay = Math.min(reminder.day_of_month!, lastDayOfMonth);
         if (dayOfMonthToday === targetDay) {
-          await this.triggerReminder(reminder);
+          await this.triggerReminder(reminder, targetDay);
         }
       }
     }
   }
 
-  private async triggerReminder(reminder: Reminder) {
+  private async triggerReminder(reminder: Reminder, day: number) {
     this.logger.log(
       `Triggering reminder ID=${reminder.id} for user ${reminder.user_id}`,
     );
-
     const today = new Date();
     let from: Date;
+    let to: Date;
 
     if (reminder.type === ReminderEnum.WEEKLY) {
       from = new Date(today);
       from.setDate(today.getDate() - 7);
-    } else {
-      from = new Date(today);
-      from.setDate(today.getDate() - 30)
+      to = today;
+    } 
+    else {
+      // current cycle start (e.g. Dec 12, 00:00:00.000)
+      const currentStart = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        day,
+        0, 0, 0, 0
+      );
+      // previous cycle start (e.g. Nov 12, 00:00:00.000)
+      const previousStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        day,
+        0, 0, 0, 0
+      );
+
+      from = previousStart;
+      to = new Date(currentStart.getTime() - 1); // -> 1ms before cycle start (e.g. Nov 12 00:00 → Dec 11 23:59:59.999)
     }
 
     await this.remindersService.sendReminderReportEmail(
       reminder.user_id,
       from,
-      today
+      to
     );
   }
 }

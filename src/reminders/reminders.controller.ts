@@ -12,9 +12,7 @@ import { DeleteReminderResponse, ReminderResponse } from './dto/reminders-respon
 @UseGuards(PremiumGuard)
 @Controller('reminders')
 export class RemindersController {
-  constructor( 
-    private readonly remindersService: RemindersService 
-  ) {}
+  constructor( private readonly remindersService: RemindersService ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new reminder (Premium only)' })

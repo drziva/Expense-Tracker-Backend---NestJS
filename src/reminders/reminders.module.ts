@@ -13,7 +13,6 @@ import { RemindersScheduler } from './reminders.scheduler';
     TypeOrmModule.forFeature([Reminder]),
     UsersModule,
     ReportsModule,
-    UsersModule,
     EmailModule
   ],
   providers: [

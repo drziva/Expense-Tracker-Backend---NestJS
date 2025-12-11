@@ -126,6 +126,10 @@ export class ReportsService {
         return this.emailService.sendFinancialReportEmail(user, pdf);
     }
 
+    timestamp() {
+        return new Date().toISOString().replace(/[:T]/g, '-').slice(0,19);
+    }
+
     private sum(items: {amount: number}[]): number {
         return items.reduce((sum,item) => sum + Number(item.amount), 0);
     }

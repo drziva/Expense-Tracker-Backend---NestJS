@@ -11,6 +11,7 @@ import { ReportsModule } from './reports/reports.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { EmailModule } from './email/email.module';
 import { ScheduleModule } from '@nestjs/schedule'
+import { ScheduledTransactionsModule } from './scheduled-transactions/scheduled-transactions.module';
 import config from './config';
 
 
@@ -42,7 +43,8 @@ import config from './config';
     IncomeGroupsModule,
     ReportsModule,
     RemindersModule,
-    EmailModule
+    EmailModule,
+    ScheduledTransactionsModule
   ],
 })
 export class AppModule {}

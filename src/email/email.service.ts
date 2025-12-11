@@ -82,63 +82,67 @@ export class EmailService {
             subject,
             html,
             pdf,
-            `${user.username}_report.pdf`
+            `${user.username}_report_${this.timestamp()}.pdf`
         );
     }
 
-        async sendReminderReportEmail(
-            user: User,
-            pdf: Buffer
-        ): Promise<void> {
-            const subject = "Your recurring spending report";
+    async sendReminderReportEmail(
+        user: User,
+        pdf: Buffer
+    ): Promise<void> {
+        const subject = "Your recurring spending report";
 
-            const html = `
-                <h1>Hi, ${user.username}!</h1>
-                <h2>Your reccuring spending report is ready</h2>
-                <p>See the attached PDF for more details.</p>
-            `;
+        const html = `
+            <h1>Hi, ${user.username}!</h1>
+            <h2>Your reccuring spending report is ready</h2>
+            <p>See the attached PDF for more details.</p>
+        `;
 
-            return this.sendWithAttachment(
-                user.email,
-                subject,
-                html,
-                pdf,
-                `${user.username}_report.pdf`
-            );
-        }
+        return this.sendWithAttachment(
+            user.email,
+            subject,
+            html,
+            pdf,
+            `${user.username}_report_${this.timestamp()}.pdf`
+        );
+    }
 
-        async sendBudgetCapAlert(
-            user: User,
-            group: ExpenseGroup,
-            totalAfter: number
-        ) {
-            const subject = "Budget cap exceeded";
+    async sendBudgetCapAlert(
+        user: User,
+        group: ExpenseGroup,
+        totalAfter: number
+    ) {
+        const subject = "Budget cap exceeded";
 
-            const html = `
-                <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2 style="color: #d9534f;">Budget Cap Exceeded</h2>
-                    <p>Hi ${user.username},</p>
+        const html = `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2 style="color: #d9534f;">Budget Cap Exceeded</h2>
+                <p>Hi ${user.username},</p>
 
-                    <p>
-                        You've exceeded the monthly budget cap for the 
-                        <strong>${group.name}</strong> group.
-                    </p>
+                <p>
+                    You've exceeded the monthly budget cap for the 
+                    <strong>${group.name}</strong> group.
+                </p>
 
-                    <p>
-                        <strong>Budget cap:</strong> ${group.monthly_budget_cap} €<br/>
-                        <strong>Current total:</strong> ${totalAfter.toFixed(2)} €
-                    </p>
+                <p>
+                    <strong>Budget cap:</strong> ${group.monthly_budget_cap} €<br/>
+                    <strong>Current total:</strong> ${totalAfter.toFixed(2)} €
+                </p>
 
-                    <p>
-                        Consider reviewing your recent expenses or adjusting your budget 
-                        to stay on track for the rest of the month.
-                    </p>
+                <p>
+                    Consider reviewing your recent expenses or adjusting your budget 
+                    to stay on track for the rest of the month.
+                </p>
 
-                    <p style="margin-top: 30px; color: #6c757d;">
-                        This is an automated notification from your VegaIT Expense Tracker.
-                    </p>
-                </div>
-            `;
-            return this.send(user.email,subject,html);
-        }
+                <p style="margin-top: 30px; color: #6c757d;">
+                    This is an automated notification from your VegaIT Expense Tracker.
+                </p>
+            </div>
+        `;
+        return this.send(user.email,subject,html);
+    }
+
+    private timestamp() {
+        return new Date().toISOString().replace(/[:T]/g, '-').slice(0,19);
+    }
 }
