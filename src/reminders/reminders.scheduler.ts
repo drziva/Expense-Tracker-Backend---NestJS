@@ -17,7 +17,7 @@ export class RemindersScheduler {
     private readonly logger: Logger
   ) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_8AM)
+  @Cron(CronExpression.EVERY_DAY_AT_8AM, { timeZone: 'Europe/Belgrade' })
   async handleReminders() {
     const reminders = await this.reminderRepo.find({ where: { active: true } });
 

@@ -1,7 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IncomeGroup } from './income-groups.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/users.service';
 import { Like, Repository } from 'typeorm';
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
 import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
@@ -106,6 +105,13 @@ export class IncomeGroupsService {
             throw error;
         }
     }
+
+    async findById(userId:number, id: number) {
+        const group = await this.incomeGroupRepo.findOne({ where: { id, user_id: userId } });
+        if (!group) throw new NotFoundException('Income group not found');
+        return group;
+    }
+
 
     async updateGroup(
         userId: number,

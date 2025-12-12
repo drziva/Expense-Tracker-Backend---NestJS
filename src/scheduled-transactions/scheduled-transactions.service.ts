@@ -3,8 +3,6 @@ import { Repository } from 'typeorm';
 import { ScheduledTransaction } from './scheduled-transactions.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateScheduledTransactionDto } from './dto/create-scheduled-transaction.dto';
-import { ExpensesService } from 'src/expenses/expenses.service';
-import { IncomesService } from 'src/incomes/incomes.service';
 import { TransactionEnum } from './dto/scheduled-transactions.types';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { IncomeGroup } from 'src/income-groups/income-groups.entity';
@@ -29,22 +27,28 @@ export class ScheduledTransactionsService {
   }
 
   async create(userId: number,dto:CreateScheduledTransactionDto): Promise<ScheduledTransactionResponse> {
-    await this.validateTransaction(userId,dto);
+    try{
+      await this.validateTransaction(userId,dto);
+      const schedTransaction = this.scheduledTransactionsRepo.create({
+        user_id: userId,
+        description: dto.description,
+        amount: dto.amount,
+        date: dto.date,
+        type: dto.type,
+        income_group_id: dto.type===TransactionEnum.INCOME ? dto.incomeGroupId : null,
+        expense_group_id: dto.type===TransactionEnum.EXPENSE ? dto.expenseGroupId : null,
+      });
+        const saved = await this.scheduledTransactionsRepo.save(schedTransaction);
 
-    const schedTransaction = this.scheduledTransactionsRepo.create({
-      user_id: userId,
-      description: dto.description,
-      amount: dto.amount,
-      date: dto.date,
-      type: dto.type,
-      income_group_id: dto.type===TransactionEnum.INCOME ? dto.incomeGroupId : null,
-      expense_group_id: dto.type===TransactionEnum.EXPENSE ? dto.expenseGroupId : null,
-    });
-    const saved = await this.scheduledTransactionsRepo.save(schedTransaction);
-    return this.toScheduledTransactionResponse(saved);
+        return this.toScheduledTransactionResponse(saved);
+    } catch(error) {
+        console.error("Error creating transaction: ",error)
+        throw error;
+    }
   }
 
   async update(userId: number, id:number, dto:UpdateScheduledTransactionDto) {
+    try {    
     await this.validateTransaction(userId,dto);
     const transaction = await this.scheduledTransactionsRepo.findOne({where:{id,user_id:userId}});
     if(!transaction){
@@ -59,6 +63,10 @@ export class ScheduledTransactionsService {
 
     const saved = await this.scheduledTransactionsRepo.save(transaction);
     return this.toScheduledTransactionResponse(saved);
+    } catch(error) {
+      console.error("Error updating transaction: ", error);
+      throw error;
+    }
   }
 
   async delete(userId: number, id: number): Promise<DeleteScheduledTransactionResponse> {

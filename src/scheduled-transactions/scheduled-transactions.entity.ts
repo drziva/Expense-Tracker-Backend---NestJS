@@ -31,6 +31,9 @@ export class ScheduledTransaction {
   @Column({ nullable: true })
   income_group_id: number | null;
 
+  @Column({type: 'boolean', default:false})
+  processed: boolean
+
   @ManyToOne(() => User, (user) => user.scheduledTransactions, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name:"user_id" })
   user: User;
