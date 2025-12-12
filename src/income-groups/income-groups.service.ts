@@ -112,7 +112,6 @@ export class IncomeGroupsService {
         return group;
     }
 
-
     async updateGroup(
         userId: number,
         groupId: number,

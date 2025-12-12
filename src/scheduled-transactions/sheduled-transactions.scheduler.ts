@@ -36,7 +36,7 @@ export class ScheduledTransactionsScheduler {
             }
         } catch(error){
             this.logger.error(
-            'Error processing transaction',
+            `Error processing transaction ${transaction.id}`,
             error?.stack ?? error,
             );
             continue;
