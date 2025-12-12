@@ -10,16 +10,21 @@ import * as puppeteer from "puppeteer";
 import { EmailService } from 'src/email/email.service';
 import { UsersService } from 'src/users/users.service';
 import { TransactionForReport } from './dto/transaction-for-report.dto';
+import { ReminderReport } from './reports.types';
+import { renderReminderReportTemplate } from './templates/reminder-report.template';
+import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
+import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
+import { renderTransactionTableTemplate } from './templates/transaction-table.template';
 
 @Injectable()
 export class ReportsService {
     constructor(
-        private expensesService: ExpensesService,
-        private incomesService: IncomesService,
-        private expenseGroupsService: ExpenseGroupsService,
-        private incomeGroupsService: IncomeGroupsService,
-        private emailService: EmailService,
-        private usersService: UsersService
+        private readonly expensesService: ExpensesService,
+        private readonly incomesService: IncomesService,
+        private readonly expenseGroupsService: ExpenseGroupsService,
+        private readonly incomeGroupsService: IncomeGroupsService,
+        private readonly emailService: EmailService,
+        private readonly usersService: UsersService
     ) {}
 
     async getReport(userId: number, options: GetReportQueryDto): Promise<ReportResponse> {
@@ -56,6 +61,42 @@ export class ReportsService {
         }
     }
 
+    async getReminderReport(
+        userId: number,
+        from: Date,
+        to:Date
+    ): Promise<ReminderReport> {
+        const expenses = await this.expensesService.getForReport(userId,from,to);
+        if(expenses.length === 0){
+            throw new NotFoundException("No expenses were found for the user");
+        }
+        const totalSpent = this.sum(expenses);
+        const expenseGroupNames: Record<number,string> = await this.expenseGroupsService.getGroupsForUser(userId);
+        const expensesForReport = this.toReportFormat(expenses,expenseGroupNames);
+        const expensesTotalsByGroup = this.sumByGroup(expenses,expenseGroupNames);
+
+        const groups = await this.expenseGroupsService.findAll(userId);
+        const groupSummary = groups.map(group => {
+            const spent = expensesTotalsByGroup[group.name] ?? 0;
+            const budget = group.monthly_budget_cap ?? null;
+            const difference = budget != null ? budget - spent : null;
+            return {
+                groupName: group.name,
+                budget,
+                spent,
+                difference,
+            };
+        });
+        return {
+            totalSpent: totalSpent,
+            expenses: expensesForReport,
+            expenseTotals: expensesTotalsByGroup,
+            from: from,
+            to: to,
+            groupSummary
+        }
+    }
+
     async generatePdfReport(
         userId: number,
         options: GetReportQueryDto
@@ -67,11 +108,26 @@ export class ReportsService {
         return pdf;
     } 
 
+    async generateReminderPdf(userId: number, from: Date, to: Date): Promise<Buffer> {
+        const data = await this.getReminderReport(userId, from, to);
+        const html = renderReminderReportTemplate(data);
+        return this.htmlToPdf(html);
+    }
+
+    async generateTransactionTablePdf(transactions: ExpenseResponse[] | IncomeResponse[], type:string): Promise<Buffer> {
+        const html = renderTransactionTableTemplate(transactions, type);
+        return this.htmlToPdf(html);
+    }
+
     async sendReportEmail(userId: number, options: GetReportQueryDto): Promise<void> {
         const user = (await this.usersService.findById(userId))!;
         const pdf = await this.generatePdfReport(userId, options);
 
         return this.emailService.sendFinancialReportEmail(user, pdf);
+    }
+
+    timestamp(): string {
+        return new Date().toISOString().replace(/[:T]/g, '-').slice(0,19);
     }
 
     private sum(items: {amount: number}[]): number {

@@ -29,3 +29,7 @@ export class ReportResponse {
   })
   incomesByGroup: Record<string, number>;
 }
+
+export class EmailReportResponse {
+  success: boolean;
+};

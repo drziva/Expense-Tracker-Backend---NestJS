@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class DeleteExpenseResponse {
   @ApiProperty({ example: true })
@@ -23,6 +23,9 @@ export class ExpenseResponse {
 
   @ApiProperty({ example: 3 })
   groupId: number;
+
+  @ApiPropertyOptional({ example: 'Groceries' })
+  groupName?: string;
 }
 
 export class GetExpenseResponse {

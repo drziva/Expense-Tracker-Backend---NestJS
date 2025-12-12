@@ -14,10 +14,9 @@ import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } fr
 export class ExpenseGroupsService {
     constructor(
         @InjectRepository(ExpenseGroup)
-        private expenseGroupRepo: Repository<ExpenseGroup>,
+        private readonly expenseGroupRepo: Repository<ExpenseGroup>,
         @InjectRepository(Expense)
-        private expenseRepo: Repository<Expense>,
-        private usersService: UsersService,
+        private readonly expenseRepo: Repository<Expense>
     ){}
 
     async getGroupById(userId: number, groupId: number): Promise<GroupResponse>{
@@ -38,12 +37,10 @@ export class ExpenseGroupsService {
     async getFilteredGroups( userId: number, options: GroupQueryOptions): Promise<GetGroupResponse> {
         const where: any = { user_id: userId };
         const { search, sort, page = 1, limit = 20 } = options;
-
         // Filtering — name search
         if (search) {
         where.name = Like(`%${search}%`);
         }
-
         // Sorting
         let order: any = { created_at: 'DESC' }; // Default
 
@@ -61,7 +58,6 @@ export class ExpenseGroupsService {
             order = { created_at: 'DESC' };
             break;
         }
-
         // Pagination
         const skip = (page - 1) * limit;
         const [groups, total] = await this.expenseGroupRepo.findAndCount({
@@ -70,7 +66,6 @@ export class ExpenseGroupsService {
             skip,
             take: limit
         });
-
         return {
             data: groups.map(g => this.toGroupResponse(g)),
             page,
@@ -199,6 +194,16 @@ export class ExpenseGroupsService {
         return groupNames;
     }
 
+    async findAll(userId: number): Promise<ExpenseGroup[]> {
+        return await this.expenseGroupRepo.find({where:{user_id: userId}});
+    }
+
+    async findById(userId:number, id: number): Promise<ExpenseGroup> {
+        const group = await this.expenseGroupRepo.findOne({ where: { id, user_id: userId } });
+        if (!group) throw new NotFoundException('Expense group not found');
+        return group;
+    }
+
     private toGroupResponse(expenseGroup: ExpenseGroup): GroupResponse {
         return {
             id: expenseGroup.id,
@@ -221,12 +226,12 @@ export class ExpenseGroupsService {
     }
 
     private toExpenseResponse(expense: Expense): ExpenseResponse {
-    return {
-        id: expense.id,
-        amount: expense.amount,
-        description: expense.description,
-        groupId: expense.group_id,
-        createdAt: expense.created_at
-    };
-}
+        return {
+            id: expense.id,
+            amount: expense.amount,
+            description: expense.description,
+            groupId: expense.group_id,
+            createdAt: expense.created_at
+        };
+    }
 }

@@ -16,7 +16,7 @@ import { BudgetStatusDto } from './dto/budget-status.dto';
 @ApiBearerAuth()
 @Controller('expense-groups')
 export class ExpenseGroupsController {
-    constructor(private expenseGroupsService: ExpenseGroupsService) {}
+    constructor(private readonly expenseGroupsService: ExpenseGroupsService) {}
 
     @ApiOperation({ summary: 'Get all groups for user with filtering, sorting, and pagination.' })
     @ApiOkResponse({ 

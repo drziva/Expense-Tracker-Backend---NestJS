@@ -6,7 +6,6 @@ import { UserId } from "src/auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from "@nestjs/swagger";
 import { GetExpensesQueryDto } from "./dto/get-expenses-query.dto";
-import { EmailService } from "src/email/email.service";
 
 @ApiBearerAuth()
 @Controller("expenses")

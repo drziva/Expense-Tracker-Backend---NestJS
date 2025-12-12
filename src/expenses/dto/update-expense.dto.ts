@@ -27,6 +27,6 @@ export class UpdateExpenseDto {
   })
 
   @Type(() => Number)
-  @IsNumber({}, { message: 'group_id must be a valid number' })
+  @IsNumber({}, { message: 'groupId must be a valid number' })
   groupId: number;
 }

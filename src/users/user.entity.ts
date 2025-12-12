@@ -4,6 +4,7 @@ import { Expense } from 'src/expenses/expenses.entity';
 import { Income } from 'src/incomes/incomes.entity';
 import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 import { Reminder } from 'src/reminders/reminders.entity';
+import { ScheduledTransaction } from 'src/scheduled-transactions/scheduled-transactions.entity';
 
 @Entity("user")
 export class User {
@@ -18,6 +19,9 @@ export class User {
 
   @Column()
   email: string;
+
+  @Column({ type: 'boolean', default: false })
+  budget_cap_notifications: boolean
 
   @Column({ type: 'boolean', default: false })
   premium: boolean;
@@ -36,4 +40,7 @@ export class User {
 
   @OneToMany(() => Reminder, reminder => reminder.user)
   reminders: Reminder[];
+
+  @OneToMany( ()=> ScheduledTransaction, schedTransaction => schedTransaction.user)
+  scheduledTransactions: ScheduledTransaction
 }
