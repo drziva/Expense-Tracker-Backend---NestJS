@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { ScheduledTransaction } from './scheduled-transactions.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,8 @@ import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 import { ScheduledTransactionResponse } from './dto/scheduled-transactions-responses';
 import { UpdateScheduledTransactionDto } from './dto/update-scheduled-transaction.dto';
 import { DeleteScheduledTransactionResponse } from './dto/delete-scheduled-transaction.dto';
+import { IncomesService } from 'src/incomes/incomes.service';
+import { ExpensesService } from 'src/expenses/expenses.service';
 
 @Injectable()
 export class ScheduledTransactionsService {
@@ -18,10 +20,13 @@ export class ScheduledTransactionsService {
     @InjectRepository(ExpenseGroup)
     private readonly expenseGroupRepo: Repository<ExpenseGroup>,
     @InjectRepository(IncomeGroup)
-    private readonly incomeGroupRepo: Repository<IncomeGroup>
+    private readonly incomeGroupRepo: Repository<IncomeGroup>,
+    private readonly incomesService: IncomesService,
+    private readonly expensesService: ExpensesService,
+    private readonly logger: Logger
   ) {}
 
-  async getAll(userId: number) {
+  async getAll(userId: number): Promise<ScheduledTransactionResponse[]> {
     const transactions = await this.scheduledTransactionsRepo.find({ where: { user_id:userId } });
     return transactions.map(tr=>(this.toScheduledTransactionResponse(tr)));
   }
@@ -29,7 +34,7 @@ export class ScheduledTransactionsService {
   async create(userId: number,dto:CreateScheduledTransactionDto): Promise<ScheduledTransactionResponse> {
     try{
       await this.validateTransaction(userId,dto);
-      const schedTransaction = this.scheduledTransactionsRepo.create({
+      const scheduledTransaction = this.scheduledTransactionsRepo.create({
         user_id: userId,
         description: dto.description,
         amount: dto.amount,
@@ -38,16 +43,19 @@ export class ScheduledTransactionsService {
         income_group_id: dto.type===TransactionEnum.INCOME ? dto.incomeGroupId : null,
         expense_group_id: dto.type===TransactionEnum.EXPENSE ? dto.expenseGroupId : null,
       });
-        const saved = await this.scheduledTransactionsRepo.save(schedTransaction);
+        const saved = await this.scheduledTransactionsRepo.save(scheduledTransaction);
 
         return this.toScheduledTransactionResponse(saved);
     } catch(error) {
-        console.error("Error creating transaction: ",error)
+      this.logger.error(
+        'Error creating transaction',
+        error?.stack ?? error,
+      );
         throw error;
     }
   }
 
-  async update(userId: number, id:number, dto:UpdateScheduledTransactionDto) {
+  async update(userId: number, id:number, dto:UpdateScheduledTransactionDto): Promise<ScheduledTransactionResponse> {
     try {    
     await this.validateTransaction(userId,dto);
     const transaction = await this.scheduledTransactionsRepo.findOne({where:{id,user_id:userId}});
@@ -64,7 +72,10 @@ export class ScheduledTransactionsService {
     const saved = await this.scheduledTransactionsRepo.save(transaction);
     return this.toScheduledTransactionResponse(saved);
     } catch(error) {
-      console.error("Error updating transaction: ", error);
+      this.logger.error(
+        'Error updating transaction',
+        error?.stack ?? error,
+      );
       throw error;
     }
   }
@@ -81,12 +92,46 @@ export class ScheduledTransactionsService {
         id:id
       }
     } catch(error) {
-      console.error("Error deleting transaction: ",error);
+      this.logger.error(
+        'Error deleting transaction',
+        error?.stack ?? error,
+      );
       throw error;
     }
   }
 
-  private async validateTransaction(userId: number, dto: CreateScheduledTransactionDto): Promise<void> {
+  async createIncomeFromTransaction(transaction: ScheduledTransaction): Promise<void> {
+    await this.incomesService.create(
+      {
+        amount: transaction.amount,
+        description: transaction.description,
+        groupId: transaction.income_group_id!,
+      },
+      transaction.user_id,
+    );
+    await this.scheduledTransactionsRepo.update(transaction.id,{
+      processed:true
+    });
+  }
+
+  async createExpenseFromTransaction(transaction: ScheduledTransaction): Promise<void> {
+    await this.expensesService.create(
+      {
+        amount: transaction.amount,
+        description: transaction.description,
+        groupId: transaction.expense_group_id!,
+      },
+      transaction.user_id,
+    );
+    await this.scheduledTransactionsRepo.update(transaction.id,{
+      processed:true
+    });
+  }
+
+  private async validateTransaction(
+    userId: number,
+    dto: CreateScheduledTransactionDto | UpdateScheduledTransactionDto
+  ): Promise<void> {
     const now = new Date();
     if (dto.date.getTime() <= now.getTime()) {
       throw new ConflictException("Date must be in the future");
@@ -112,7 +157,7 @@ export class ScheduledTransactionsService {
   private toScheduledTransactionResponse(schedTransaction: ScheduledTransaction): ScheduledTransactionResponse {
     return {
       id:schedTransaction.id,
-      user_id: schedTransaction.user_id,      
+      userId: schedTransaction.user_id,      
       amount:schedTransaction.amount,
       description: schedTransaction.description,
       date: schedTransaction.date,

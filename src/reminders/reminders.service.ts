@@ -48,7 +48,7 @@ export class RemindersService {
     return reminders.map(rem => this.toReminderResponse(rem))
   }
 
-  async update(userId: number, id: number, dto: UpdateReminderDto) {
+  async update(userId: number, id: number, dto: UpdateReminderDto): Promise<ReminderResponse> {
     try {
       const reminder = await this.reminderRepo.findOne({
         where: { id, user_id: userId },
@@ -96,7 +96,7 @@ export class RemindersService {
     }
   }
 
-  async sendReminderReportEmail(userId: number, from: Date, to: Date) {
+  async sendReminderReportEmail(userId: number, from: Date, to: Date): Promise<void> {
       const user = (await this.usersService.findById(userId))!;
       const pdf = await this.reportsService.generateReminderPdf(userId, from, to);
 

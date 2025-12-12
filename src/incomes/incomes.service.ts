@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, FindOptionsOrder, FindOptionsWhere, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { Income } from './incomes.entity';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { DeleteIncomeResponse, GetIncomeResponse, IncomeResponse } from './dto/incomes-responses.dto';
@@ -147,49 +147,52 @@ export class IncomesService {
         };
     }
 
-private buildSortAndFilter(userId:number, options: IncomeQueryOptions) {
-        const where: any = { user_id: userId};
-        const { from, to, min, max, sort, search, group_id } = options;
-        //Filtering
-        if (group_id !== undefined) {
-            where.group_id = group_id;
-        }
+    private buildSortAndFilter(userId:number, options: IncomeQueryOptions): {
+        where: FindOptionsWhere<Income>,
+        order: FindOptionsOrder<Income>
+    } {
+            const where: any = { user_id: userId};
+            const { from, to, min, max, sort, search, group_id } = options;
+            //Filtering
+            if (group_id !== undefined) {
+                where.group_id = group_id;
+            }
 
-        if (from && to) {
-            where.created_at = Between(from, to);
-        } else if (from) {
-            where.created_at = MoreThanOrEqual(from);
-        } else if (to) {
-            where.created_at = LessThanOrEqual(to);
-        }
+            if (from && to) {
+                where.created_at = Between(from, to);
+            } else if (from) {
+                where.created_at = MoreThanOrEqual(from);
+            } else if (to) {
+                where.created_at = LessThanOrEqual(to);
+            }
 
-        if (min !== undefined && max !== undefined) {
-            where.amount = Between(min, max);
-        } else if (min !== undefined) {
-            where.amount = MoreThanOrEqual(min);
-        } else if (max !== undefined) {
-            where.amount = LessThanOrEqual(max);
-        }
-        if (search) {
-            where.description =  Like(`%${search}%`);
-        }
-        //Sorting
-        let order: any = { created_at: 'DESC' }; // Default order
-        switch(sort) {
-            case 'amount_asc':
-                order = { amount: 'ASC' };
-                break;
-            case 'amount_desc':
-                order = { amount: 'DESC' };
-                break;
-            case 'date_asc':
-                order = { created_at: 'ASC' };
-                break;
-            case 'date_desc':
-                order = { created_at: 'DESC' };
-                break;
-        }
+            if (min !== undefined && max !== undefined) {
+                where.amount = Between(min, max);
+            } else if (min !== undefined) {
+                where.amount = MoreThanOrEqual(min);
+            } else if (max !== undefined) {
+                where.amount = LessThanOrEqual(max);
+            }
+            if (search) {
+                where.description =  Like(`%${search}%`);
+            }
+            //Sorting
+            let order: any = { created_at: 'DESC' }; // Default order
+            switch(sort) {
+                case 'amount_asc':
+                    order = { amount: 'ASC' };
+                    break;
+                case 'amount_desc':
+                    order = { amount: 'DESC' };
+                    break;
+                case 'date_asc':
+                    order = { created_at: 'ASC' };
+                    break;
+                case 'date_desc':
+                    order = { created_at: 'DESC' };
+                    break;
+            }
 
-        return {where, order}
-    }
+            return {where, order}
+        }
 }

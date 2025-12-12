@@ -194,11 +194,11 @@ export class ExpenseGroupsService {
         return groupNames;
     }
 
-    async findAll(userId: number) {
+    async findAll(userId: number): Promise<ExpenseGroup[]> {
         return await this.expenseGroupRepo.find({where:{user_id: userId}});
     }
 
-    async findById(userId:number, id: number) {
+    async findById(userId:number, id: number): Promise<ExpenseGroup> {
         const group = await this.expenseGroupRepo.findOne({ where: { id, user_id: userId } });
         if (!group) throw new NotFoundException('Expense group not found');
         return group;

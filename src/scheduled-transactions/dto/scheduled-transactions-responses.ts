@@ -12,7 +12,7 @@ export class ScheduledTransactionResponse {
     example: 3,
     description: "ID of the user who owns this transaction",
   })
-  user_id: number;
+  userId: number;
 
   @ApiProperty({
     example: 450.00,

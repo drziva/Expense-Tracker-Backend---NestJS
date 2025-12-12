@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './expenses.entity';
-import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, FindOptionsOrder, FindOptionsWhere, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-responses.dto';
@@ -177,7 +177,10 @@ export class ExpensesService {
         };
     }
 
-    private buildSortAndFilter(userId:number, options: ExpenseQueryOptions) {
+    private buildSortAndFilter(userId:number, options: ExpenseQueryOptions): {
+            where: FindOptionsWhere<Expense>,
+            order: FindOptionsOrder<Expense>
+        }  {
         const where: any = { user_id: userId};
         const { from, to, min, max, sort, search, group_id } = options;
         //Filtering

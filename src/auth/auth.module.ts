@@ -16,7 +16,7 @@ import { ConfigService } from '@nestjs/config';
         secret: configService.get<string>('jwt.secret'),
         signOptions: { expiresIn: '3h' },
       }),
-  })
+    })
   ],
   providers: [
     AuthService,

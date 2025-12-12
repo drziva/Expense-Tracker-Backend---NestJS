@@ -90,7 +90,7 @@ export class ScheduledTransactionsController {
   async delete(
     @UserId() userId: number,
     @Param('id', ParseIntPipe) id: number,
-  ) {
+  ): Promise<DeleteScheduledTransactionResponse> {
     return await this.scheduledTransactionsService.delete(userId, id);
   }
 }

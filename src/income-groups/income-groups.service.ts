@@ -106,7 +106,7 @@ export class IncomeGroupsService {
         }
     }
 
-    async findById(userId:number, id: number) {
+    async findById(userId:number, id: number): Promise<IncomeGroup> {
         const group = await this.incomeGroupRepo.findOne({ where: { id, user_id: userId } });
         if (!group) throw new NotFoundException('Income group not found');
         return group;

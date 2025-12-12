@@ -114,7 +114,7 @@ export class ReportsService {
         return this.htmlToPdf(html);
     }
 
-    async generateTransactionTablePdf(transactions: ExpenseResponse[] | IncomeResponse[], type:string) {
+    async generateTransactionTablePdf(transactions: ExpenseResponse[] | IncomeResponse[], type:string): Promise<Buffer> {
         const html = renderTransactionTableTemplate(transactions, type);
         return this.htmlToPdf(html);
     }
@@ -126,7 +126,7 @@ export class ReportsService {
         return this.emailService.sendFinancialReportEmail(user, pdf);
     }
 
-    timestamp() {
+    timestamp(): string {
         return new Date().toISOString().replace(/[:T]/g, '-').slice(0,19);
     }
 

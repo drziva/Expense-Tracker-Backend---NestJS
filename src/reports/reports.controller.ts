@@ -4,7 +4,7 @@ import type { Response } from 'express';
 import { ReportsService } from './reports.service';
 import { UserId } from 'src/auth/user-id.decorator';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
-import { ReportResponse } from './dto/reports-responses.dto';
+import { EmailReportResponse, ReportResponse } from './dto/reports-responses.dto';
 import { GetExpensesQueryDto } from 'src/expenses/dto/get-expenses-query.dto';
 import { ExpensesService } from 'src/expenses/expenses.service';
 import { IncomesService } from 'src/incomes/incomes.service';
@@ -58,7 +58,7 @@ export class ReportsController {
     async getEmail(
         @UserId() userId: number,
         @Query() query: GetReportQueryDto
-    ) {
+    ): Promise<EmailReportResponse> {
         await this.reportsService.sendReportEmail(userId, query);
         return { success: true };
     }
@@ -87,7 +87,7 @@ export class ReportsController {
         @UserId() userId: number,
         @Query() query: GetReportQueryDto,
         @Res() res: Response,
-    ) {
+    ): Promise<void> {
         const pdf = await this.reportsService.generatePdfReport(userId, query);
 
         res.set({
@@ -104,7 +104,7 @@ export class ReportsController {
         @UserId() userId: number,
         @Query() query: GetExpensesQueryDto,
         @Res() res: Response,
-    ) {
+    ): Promise<void> {
         const expenses = await this.expensesService.getFilteredForPdf(userId, query);
         const pdf = await this.reportsService.generateTransactionTablePdf(expenses, "expense");
 
@@ -122,7 +122,7 @@ export class ReportsController {
         @UserId() userId: number,
         @Query() query: GetExpensesQueryDto,
         @Res() res: Response,
-    ) {
+    ): Promise<void> {
         const incomes = await this.incomesService.getFilteredForPdf(userId, query);
         const pdf = await this.reportsService.generateTransactionTablePdf(incomes, "income");
 

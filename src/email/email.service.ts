@@ -45,7 +45,7 @@ export class EmailService {
         html: string,
         pdfBuffer: Buffer,
         filename: string,
-        ): Promise<void> {
+    ): Promise<void> {
         try {
             await this.resend.emails.send({
             from: this.from,
@@ -68,7 +68,7 @@ export class EmailService {
     async sendFinancialReportEmail(
         user: User,
         pdf: Buffer
-        ): Promise<void> {
+    ): Promise<void> {
         const subject = "Your Financial Report -- VegaIT";
 
         const html = `
@@ -111,7 +111,7 @@ export class EmailService {
         user: User,
         group: ExpenseGroup,
         totalAfter: number
-    ) {
+    ): Promise<void> {
         const subject = "Budget cap exceeded";
 
         const html = `
@@ -142,7 +142,7 @@ export class EmailService {
         return this.send(user.email,subject,html);
     }
 
-    private timestamp() {
+    private timestamp(): string {
         return new Date().toISOString().replace(/[:T]/g, '-').slice(0,19);
     }
 }
