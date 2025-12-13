@@ -58,7 +58,7 @@ export class ExpensesController {
     return this.expensesService.getExpenseById(id, userId);
   }
 
-  @Post("add")
+  @Post()
   @ApiOperation({ summary: "Create a new expense" })
   @ApiCreatedResponse({
     description: "Expense created successfully",

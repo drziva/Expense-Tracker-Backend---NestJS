@@ -67,7 +67,7 @@ export class IncomesController {
     return this.incomesService.getIncomeById(id, userId);
   }
 
-  @Post("add")
+  @Post()
   @ApiOperation({ summary: "Create a new income" })
   @ApiCreatedResponse({
     description: "Income created successfully",
