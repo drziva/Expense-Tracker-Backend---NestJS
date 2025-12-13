@@ -23,6 +23,6 @@ export class DashboardController {
   })
   @Get()
   async getDashboard(@UserId() userId: number): Promise<DashboardResponse> {
-    return this.dashboardService.getDashboard(userId);
+    return await this.dashboardService.getDashboard(userId);
   }
 }
