@@ -34,24 +34,28 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-        const user = await this.jwtService.verifyAsync(token);
-        const dbUser = await this.usersService.findById(user.sub);
-        if(!dbUser){
-          throw new NotFoundException('User does not exist in Database');
-        }
-        request.user = {
-            sub: dbUser.id,
-            username: dbUser.username,
-            email: dbUser.email,
-            premium: dbUser.premium
-        }
-        return true;
-    } catch (error) {
-        if (error?.name === 'TokenExpiredError') {
-        throw new UnauthorizedException('Token expired');
+      const user = await this.jwtService.verifyAsync(token);
+      const dbUser = await this.usersService.findById(user.sub);
+      if(!dbUser){
+        throw new NotFoundException('User does not exist in Database');
       }
-        console.error(error);
-        throw error;
+      request.user = {
+          sub: dbUser.id,
+          username: dbUser.username,
+          email: dbUser.email,
+          premium: dbUser.premium
+      }
+      return true;
+      } catch (error) { 
+          if (error?.name === 'TokenExpiredError') {
+          throw new UnauthorizedException('Token expired');
+        }
+
+        if (error?.name === 'JsonWebTokenError') {
+          throw new UnauthorizedException('Invalid token');
+        }
+
+        throw new UnauthorizedException('Unauthorized');
+      }
     }
-  }
 }
