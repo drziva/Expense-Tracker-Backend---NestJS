@@ -12,6 +12,7 @@ import { RemindersModule } from './reminders/reminders.module';
 import { EmailModule } from './email/email.module';
 import { ScheduleModule } from '@nestjs/schedule'
 import { ScheduledTransactionsModule } from './scheduled-transactions/scheduled-transactions.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import config from './config';
 
 
@@ -44,7 +45,8 @@ import config from './config';
     ReportsModule,
     RemindersModule,
     EmailModule,
-    ScheduledTransactionsModule
+    ScheduledTransactionsModule,
+    DashboardModule
   ],
 })
 export class AppModule {}

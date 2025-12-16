@@ -7,10 +7,9 @@ import { ExpenseGroupsService } from './expense-groups.service';
 import { GetGroupQueryDto } from './dto/get-expense-groups.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-responses.dto';
+import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, ExpenseGroupResponse} from './dto/expense-groups-responses.dto';
 import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
 import { BudgetStatusDto } from './dto/budget-status.dto';
-
 
 @ApiTags('Expense Groups')
 @ApiBearerAuth()
@@ -73,14 +72,14 @@ export class ExpenseGroupsController {
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ 
         description: 'Group returned successfully.',
-        type: GroupResponse 
+        type: ExpenseGroupResponse 
     })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Get(':id')
     async getGroup(
         @UserId() userId: number,
         @Param('id', ParseIntPipe) id: number
-    ): Promise<GroupResponse> {
+    ): Promise<ExpenseGroupResponse> {
         return this.expenseGroupsService.getGroupById(userId, id);
     }
 
@@ -88,14 +87,14 @@ export class ExpenseGroupsController {
     @ApiBody({ type: CreateGroupDto })
     @ApiCreatedResponse({ 
         description: 'Group created successfully.',
-        type: GroupResponse 
+        type: ExpenseGroupResponse
     })
     @ApiResponse({ status: 409, description: 'Group with this name already exists.' })
     @Post()
     async createGroup(
         @UserId() userId: number,
         @Body() dto: CreateGroupDto
-    ): Promise<GroupResponse> {
+    ): Promise<ExpenseGroupResponse> {
         return this.expenseGroupsService.createGroup(userId, dto);
     }
 
@@ -103,7 +102,7 @@ export class ExpenseGroupsController {
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ 
         description: 'Group updated successfully.',
-        type: GroupResponse 
+        type: ExpenseGroupResponse 
     })
     @ApiResponse({ status: 404, description: 'Group not found.' })
     @Put(':id')
@@ -111,7 +110,7 @@ export class ExpenseGroupsController {
         @Param('id', ParseIntPipe) groupId: number,
         @UserId() userId: number,
         @Body() dto: UpdateGroupDto
-    ): Promise<GroupResponse> {
+    ): Promise<ExpenseGroupResponse> {
         return this.expenseGroupsService.updateGroup(userId, groupId, dto)
     }
 

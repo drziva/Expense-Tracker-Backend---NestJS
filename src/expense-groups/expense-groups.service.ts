@@ -8,7 +8,7 @@ import { GroupQueryOptions } from './expense-groups.types';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
 import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto.js';
-import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, GroupResponse } from './dto/expense-groups-responses.dto.js';
+import { BudgetStatus, DeleteGroupResponse, ExpenseGroupResponse, GetGroupResponse } from './dto/expense-groups-responses.dto.js';
 
 @Injectable()
 export class ExpenseGroupsService {
@@ -19,7 +19,7 @@ export class ExpenseGroupsService {
         private readonly expenseRepo: Repository<Expense>
     ){}
 
-    async getGroupById(userId: number, groupId: number): Promise<GroupResponse>{
+    async getGroupById(userId: number, groupId: number): Promise<ExpenseGroupResponse>{
         const group = await this.validateGroup(userId, groupId);
 
         return this.toGroupResponse(group);
@@ -76,7 +76,7 @@ export class ExpenseGroupsService {
     }
 
 
-    async createGroup(userId: number, dto: CreateGroupDto): Promise<GroupResponse>{
+    async createGroup(userId: number, dto: CreateGroupDto): Promise<ExpenseGroupResponse>{
         const groupExists = await this.expenseGroupRepo.findOne({where:{name:dto.name,user_id:userId}});
         if(groupExists) throw new ConflictException("Group with this name already exists");
 
@@ -96,7 +96,7 @@ export class ExpenseGroupsService {
         }
     }       
 
-    async updateGroup(userId:number, groupId:number, dto: UpdateGroupDto): Promise<GroupResponse> {
+    async updateGroup(userId:number, groupId:number, dto: UpdateGroupDto): Promise<ExpenseGroupResponse> {
         const group = await this.validateGroup(userId, groupId);
         if (dto.name !== group.name) {
             const conflict = await this.expenseGroupRepo.findOne({
@@ -204,13 +204,14 @@ export class ExpenseGroupsService {
         return group;
     }
 
-    private toGroupResponse(expenseGroup: ExpenseGroup): GroupResponse {
+    private toGroupResponse(expenseGroup: ExpenseGroup): ExpenseGroupResponse {
         return {
             id: expenseGroup.id,
             name: expenseGroup.name,
             userId: expenseGroup.user_id,
             description: expenseGroup.description,
             createdAt: expenseGroup.created_at,
+            budgetCap: expenseGroup.monthly_budget_cap ?? undefined,
         };
     }
 

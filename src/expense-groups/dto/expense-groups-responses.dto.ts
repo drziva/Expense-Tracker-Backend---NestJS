@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GroupResponse {
+export class ExpenseGroupResponse {
   @ApiProperty({ example: 1 })
   id: number;
 
@@ -15,6 +15,9 @@ export class GroupResponse {
 
   @ApiProperty({ example: '2025-01-10T14:20:00Z' })
   createdAt: Date;
+
+  @ApiProperty({ example: '3000' })
+  budgetCap?: number;
 }
 
 export class DeleteGroupResponse {
@@ -26,8 +29,8 @@ export class DeleteGroupResponse {
 }
 
 export class GetGroupResponse {
-  @ApiProperty({ type: () => [GroupResponse] })
-  data: GroupResponse[];
+  @ApiProperty({ type: () => [ExpenseGroupResponse] })
+  data: ExpenseGroupResponse[];
 
   @ApiProperty({ example: 1 })
   page: number;
