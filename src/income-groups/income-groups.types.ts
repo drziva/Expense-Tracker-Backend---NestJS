@@ -10,5 +10,6 @@ export interface IncomeGroupQueryOptions {
     sort?: IncomeGroupSortOrder;
     page?: number;
     limit?: number;
-
+    from?: Date;
+    to?: Date;
 }

@@ -10,4 +10,6 @@ export interface GroupQueryOptions {
     sort?: ExpenseSortOrder;
     page?: number;
     limit?: number;
+    from?: Date;
+    to?: Date;
 }

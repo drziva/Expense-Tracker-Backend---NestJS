@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { ExpenseGroup } from './expense-groups.entity.ts';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
-import { Between, Like, Repository } from 'typeorm';
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { GroupQueryOptions } from './expense-groups.types';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -36,10 +36,17 @@ export class ExpenseGroupsService {
 
     async getFilteredGroups( userId: number, options: GroupQueryOptions): Promise<GetGroupResponse> {
         const where: any = { user_id: userId };
-        const { search, sort, page = 1, limit = 20 } = options;
+        const { search, sort, page = 1, limit = 20, from, to } = options;
         // Filtering — name search
         if (search) {
         where.name = Like(`%${search}%`);
+        }
+        if(from && to){
+            where.created_at = Between(from, to);
+        }else if(from){
+            where.created_at = MoreThanOrEqual(from);
+        }else if(to){
+            where.created_at = LessThanOrEqual(to);
         }
         // Sorting
         let order: any = { created_at: 'DESC' }; // Default

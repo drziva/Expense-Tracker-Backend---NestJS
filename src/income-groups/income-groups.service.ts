@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IncomeGroup } from './income-groups.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
 import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
@@ -36,13 +36,21 @@ export class IncomeGroupsService {
         userId: number,
         options: IncomeGroupQueryOptions
     ): Promise<GetIncomeGroupResponse> {
-        const { search, sort, page = 1, limit = 20 } = options;
+        const { search, sort, page = 1, limit = 20, from, to } = options;
 
         const where: any = { user_id: userId };
 
         // Search
         if (search) {
-        where.name = Like(`%${search}%`);
+            where.name = Like(`%${search}%`);
+        }
+        
+        if(from && to){
+            where.created_at = Between(from, to);
+        }else if(from){
+            where.created_at = MoreThanOrEqual(from);
+        }else if(to){
+            where.created_at = LessThanOrEqual(to);
         }
         
         // Sorting
@@ -73,11 +81,11 @@ export class IncomeGroupsService {
         });
 
         return {
-        data: groups.map(g => this.toGroupResponse(g)),
-        page,
-        limit,
-        totalItems: total,
-        totalPages: Math.ceil(total / limit),
+            data: groups.map(g => this.toGroupResponse(g)),
+            page,
+            limit,
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
         };
     }
 

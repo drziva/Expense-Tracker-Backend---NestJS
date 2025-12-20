@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsOptional, IsString, IsEnum } from "class-validator";
+import { IsOptional, IsString, IsEnum, IsDate } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IncomeGroupSortOrder } from "../income-groups.types";
 
@@ -38,4 +38,14 @@ export class GetIncomeGroupQueryDto {
     minimum: 1
   })
   page?: number;
+
+  @IsOptional()
+  @Type(()=>Date)
+  @IsDate()
+  from?: Date;
+
+  @IsOptional()
+  @Type(()=>Date)
+  @IsDate()
+  to?: Date;
 }
