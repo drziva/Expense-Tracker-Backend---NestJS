@@ -1,5 +1,7 @@
 import { ReportResponse } from "../dto/reports-responses.dto";
 
+const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAADwCAYAAAAuPDIiAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAylpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAxIDc5LjE0NjI4OTk3NzcsIDIwMjMvMDYvMjUtMjM6NTc6MTQgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCAyNS4wIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjZFRUU5ODdENjZERDExRUVBMDcyRjUxRTY3NzlCQzJDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjZFRUU5ODdFNjZERDExRUVBMDcyRjUxRTY3NzlCQzJDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NkVFRTk4N0I2NkREMTFFRUEwNzJGNTFFNjc3OUJDMkMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NkVFRTk4N0M2NkREMTFFRUEwNzJGNTFFNjc3OUJDMkMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7u4cIpAAAYXElEQVR4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";
+
 export function renderReportTemplate(report: ReportResponse): string {
   const money = (n: number) =>
     new Intl.NumberFormat("de-DE", {
@@ -8,194 +10,251 @@ export function renderReportTemplate(report: ReportResponse): string {
     }).format(n) + " €";
 
   return `
-  <html>
-    <head>
-      <style>
-        body {
-          font-family: 'Arial', sans-serif;
-          padding: 40px;
-          background: #f9fafb;
-          color: #2c2c2c;
-        }
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --paper: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --divider: rgba(0,0,0,0.08);
+      --accent: #9157f5;
+      --radius: 12px;
+    }
 
-        h1 {
-          font-size: 28px;
-          margin-bottom: 4px;
-          font-weight: 600;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        .date-subtitle {
-          font-size: 13px;
-          color: #6b7280;
-          margin-bottom: 28px;
-        }
+    body {
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      padding: 56px;
+      line-height: 1.45;
+    }
 
-        .card {
-          background: #ffffff;
-          padding: 24px;
-          border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-          margin-bottom: 32px;
-          border: 1px solid #e5e7eb;
-        }
+    /* ===== Header ===== */
 
-        .summary-item {
-          font-size: 15px;
-          margin: 8px 0;
-          display: flex;
-          justify-content: space-between;
-        }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding-bottom: 20px;
+      margin-bottom: 40px;
+      border-bottom: 2px solid rgba(145,87,245,0.12);
+    }
 
-        .summary-label {
-          color: #4b5563;
-        }
+    .header img {
+      height: 96px;
+    }
 
-        .summary-value {
-          font-weight: 600;
-          color: #111827;
-        }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin: 0;
+    }
 
-        h2 {
-          font-size: 20px;
-          margin-bottom: 14px;
-          font-weight: 600;
-          color: #374151;
-        }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 32px;
-          background: #ffffff;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
+    /* ===== Summary ===== */
 
-        th {
-          background: #f3f4f6;
-          padding: 12px;
-          text-align: left;
-          font-size: 14px;
-          font-weight: 600;
-          color: #374151;
-          border-bottom: 1px solid #e5e7eb;
-        }
+    .summary {
+      background: var(--paper);
+      border-radius: var(--radius);
+      border: 1px solid var(--divider);
+      padding: 24px;
+      margin-bottom: 40px;
+    }
 
-        td {
-          padding: 12px;
-          font-size: 14px;
-          border-bottom: 1px solid #f3f4f6;
-        }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 15px;
+    }
 
-        tr:last-child td {
-          border-bottom: none;
-        }
+    .summary-row:not(:last-child) {
+      border-bottom: 1px solid var(--divider);
+    }
 
-        tr:nth-child(even) td {
-          background: #fafafa;
-        }
-      </style>
-    </head>
+    .summary-label {
+      color: var(--text-secondary);
+    }
 
-    <body>
+    .summary-value {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
 
-      <h1>Financial Report</h1>
-      <div class="date-subtitle">
-        Generated on: ${new Date().toLocaleDateString()}
+    /* ===== Sections ===== */
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 40px 0 12px;
+    }
+
+    /* ===== Tables ===== */
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--paper);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--divider);
+      margin-bottom: 40px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(145,87,245,0.05);
+      border-bottom: 1px solid var(--divider);
+    }
+
+    td {
+      padding: 12px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .amount {
+      text-align: right;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <img src="${LOGO_BASE64}" alt="VegaIT" />
+    <div>
+      <h1>Expense Tracker – Financial Report</h1>
+      <div class="subtitle">
+        Period: ${report.from.toLocaleDateString()} – ${report.to.toLocaleDateString()}<br/>
+        Generated: ${new Date().toLocaleDateString()}
       </div>
+    </div>
+  </div>
 
-      <div class="card">
-        <div class="summary-item">
-          <span class="summary-label">Total incomes:</span>
-          <span class="summary-value">${money(report.totalIncomes)}</span>
-        </div>
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-row">
+      <span class="summary-label">Total incomes</span>
+      <span class="summary-value">${money(report.totalIncomes)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Total expenses</span>
+      <span class="summary-value">${money(report.totalExpenses)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">Balance</span>
+      <span class="summary-value">${money(report.balance)}</span>
+    </div>
+  </div>
 
-        <div class="summary-item">
-          <span class="summary-label">Total expenses:</span>
-          <span class="summary-value">${money(report.totalExpenses)}</span>
-        </div>
-
-        <div class="summary-item">
-          <span class="summary-label">Balance:</span>
-          <span class="summary-value">${money(report.balance)}</span>
-        </div>
-      </div>
-
-      <h2>Incomes by Group</h2>
-      <table>
-        <tr><th>Group</th><th>Amount</th></tr>
-        ${Object.entries(report.incomesByGroup)
-          .map(
-            ([group, amount]) => `
-            <tr>
-              <td>${group}</td>
-              <td>${money(amount)}</td>
-            </tr>
-          `
-          )
-          .join("")}
-      </table>
-      <h2>Incomes List</h2>
-      <table>
+  <!-- Incomes by group -->
+  <h2>Incomes by Group</h2>
+  <table>
+    <tr>
+      <th>Group</th>
+      <th class="amount">Amount</th>
+    </tr>
+    ${Object.entries(report.incomesByGroup)
+      .map(
+        ([group, amount]) => `
         <tr>
-          <th>Amount</th>
-          <th>Description</th>
-          <th>Date</th>
-          <th>Group</th>
+          <td>${group}</td>
+          <td class="amount">${money(amount)}</td>
         </tr>
+      `
+      )
+      .join("")}
+  </table>
 
-        ${report.incomes
-          .map(
-            (income) => `
-            <tr>
-              <td>${money(income.amount)}</td>
-              <td>${income.description || "-"}</td>
-              <td>${new Date(income.created_at).toLocaleDateString()}</td>
-              <td>${income.group}</td>
-            </tr>
-          `
-          )
-          .join("")}
-      </table>
-      <h2>Expenses by Group</h2>
-      <table>
-        <tr><th>Group</th><th>Amount</th></tr>
-        ${Object.entries(report.expensesByGroup)
-          .map(
-            ([group, amount]) => `
-            <tr>
-              <td>${group}</td>
-              <td>${money(amount)}</td>
-            </tr>
-          `
-          )
-          .join("")}
-      </table>
-      <h2>Expenses List</h2>
-      <table>
+  <!-- Incomes list -->
+  <h2>Incomes</h2>
+  <table>
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+      <th>Group</th>
+      <th class="amount">Amount</th>
+    </tr>
+    ${report.incomes
+      .map(
+        (income) => `
         <tr>
-          <th>Amount</th>
-          <th>Description</th>
-          <th>Date</th>
-          <th>Group</th>
+          <td>${new Date(income.created_at).toLocaleDateString()}</td>
+          <td>${income.description || "-"}</td>
+          <td>${income.group}</td>
+          <td class="amount">${money(income.amount)}</td>
         </tr>
+      `
+      )
+      .join("")}
+  </table>
 
-        ${report.expenses
-          .map(
-            (expense) => `
-            <tr>
-              <td>${money(expense.amount)}</td>
-              <td>${expense.description || "-"}</td>
-              <td>${new Date(expense.created_at).toLocaleDateString()}</td>
-              <td>${expense.group}</td>
-            </tr>
-          `
-          )
-          .join("")}
-      </table>
+  <!-- Expenses by group -->
+  <h2>Expenses by Group</h2>
+  <table>
+    <tr>
+      <th>Group</th>
+      <th class="amount">Amount</th>
+    </tr>
+    ${Object.entries(report.expensesByGroup)
+      .map(
+        ([group, amount]) => `
+        <tr>
+          <td>${group}</td>
+          <td class="amount">${money(amount)}</td>
+        </tr>
+      `
+      )
+      .join("")}
+  </table>
 
-    </body>
-  </html>
-  `;
+  <!-- Expenses list -->
+  <h2>Expenses</h2>
+  <table>
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+      <th>Group</th>
+      <th class="amount">Amount</th>
+    </tr>
+    ${report.expenses
+      .map(
+        (expense) => `
+        <tr>
+          <td>${new Date(expense.created_at).toLocaleDateString()}</td>
+          <td>${expense.description || "-"}</td>
+          <td>${expense.group}</td>
+          <td class="amount">${money(expense.amount)}</td>
+        </tr>
+      `
+      )
+      .join("")}
+  </table>
+
+</body>
+</html>
+`;
 }

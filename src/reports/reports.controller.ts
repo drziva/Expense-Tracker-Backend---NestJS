@@ -93,6 +93,7 @@ export class ReportsController {
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename=report_${this.reportsService.timestamp()}.pdf`,
+            'Access-Control-Expose-Headers': 'Content-Disposition',
         });
 
         res.send(pdf);

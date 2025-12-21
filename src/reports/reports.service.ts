@@ -57,7 +57,9 @@ export class ReportsService {
             incomes: incomesForReport,
             expenses: expensesForReport,
             expensesByGroup: expensesByGroup,
-            incomesByGroup: incomesByGroup
+            incomesByGroup: incomesByGroup,
+            from: from!,
+            to: to!
         }
     }
 

@@ -17,6 +17,10 @@ export class ReportResponse {
   @ApiProperty({ type: () => [TransactionForReport] })
   expenses: TransactionForReport[];
 
+  from: Date;
+
+  to: Date;
+
   @ApiProperty({
     description: 'Summary of expenses grouped by group name',
     example: { Food: 320, Transport: 90 },
