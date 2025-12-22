@@ -159,7 +159,9 @@ export class IncomesService {
             }
 
             if (from && to) {
-                where.created_at = Between(from, to);
+                const toDate = new Date(to);
+                toDate.setDate(toDate.getDate() + 1);
+                where.created_at = Between(from, toDate);
             } else if (from) {
                 where.created_at = MoreThanOrEqual(from);
             } else if (to) {
