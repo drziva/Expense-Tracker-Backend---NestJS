@@ -27,7 +27,7 @@ export class ScheduledTransactionsService {
   ) {}
 
   async getAll(userId: number): Promise<ScheduledTransactionResponse[]> {
-    const transactions = await this.scheduledTransactionsRepo.find({ where: { user_id:userId } });
+    const transactions = await this.scheduledTransactionsRepo.find({ where: { user_id:userId }, relations:["group"] });
     return transactions.map(tr=>(this.toScheduledTransactionResponse(tr)));
   }
 
@@ -163,7 +163,9 @@ export class ScheduledTransactionsService {
       date: schedTransaction.date,
       type: schedTransaction.type,
       incomeGroupId: schedTransaction.income_group_id,
-      expenseGroupId: schedTransaction.expense_group_id 
+      expenseGroupId: schedTransaction.expense_group_id,
+      expenseGroupName: schedTransaction.expense_group?.name,
+      incomeGroupName: schedTransaction.income_group?.name
     }
   }
 }

@@ -54,4 +54,7 @@ export class ScheduledTransactionResponse {
       "Expense group ID. Will be null when type = INCOME. Exactly one of incomeGroupId or expenseGroupId is non-null.",
   })
   expenseGroupId: number | null;
+
+  incomeGroupName?: string;
+  expenseGroupName?: string;
 }
