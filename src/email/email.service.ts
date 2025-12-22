@@ -115,29 +115,120 @@ export class EmailService {
         const subject = "Budget cap exceeded";
 
         const html = `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                <h2 style="color: #d9534f;">Budget Cap Exceeded</h2>
-                <p>Hi ${user.username},</p>
+           <div style="
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(180deg, #f5f6fa 0%, #eef0f5 100%);
+                padding: 48px 20px;
+                ">
+                <div style="
+                    max-width: 560px;
+                    margin: 0 auto;
+                    background-color: #ffffff;
+                    border-radius: 16px;
+                    padding: 40px;
+                    box-shadow: 0 20px 40px rgba(17,24,39,0.08);
+                ">
+                    <h2 style="
+                    margin: 0 0 20px;
+                    font-size: 22px;
+                    font-weight: 600;
+                    color: #111827;
+                    letter-spacing: -0.02em;
+                    ">
+                    Budget limit exceeded
+                    </h2>
 
-                <p>
-                    You've exceeded the monthly budget cap for the 
-                    <strong>${group.name}</strong> group.
-                </p>
+                    <p style="
+                    margin: 0 0 14px;
+                    font-size: 15px;
+                    color: #374151;
+                    line-height: 1.65;
+                    ">
+                    Hi <strong>${user.username}</strong>,
+                    </p>
 
-                <p>
-                    <strong>Budget cap:</strong> ${group.monthly_budget_cap} €<br/>
-                    <strong>Current total:</strong> ${totalAfter.toFixed(2)} €
-                </p>
+                    <p style="
+                    margin: 0 0 26px;
+                    font-size: 15px;
+                    color: #374151;
+                    line-height: 1.65;
+                    ">
+                    Your spending in the <strong>${group.name}</strong> category has gone beyond
+                    the monthly budget limit you set.
+                    </p>
 
-                <p>
-                    Consider reviewing your recent expenses or adjusting your budget 
-                    to stay on track for the rest of the month.
-                </p>
+                    <div style="
+                    background-color: #f9fafb;
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin-bottom: 28px;
+                    ">
+                    <div style="margin-bottom: 14px;">
+                        <p style="
+                        margin: 0;
+                        font-size: 13px;
+                        color: #6b7280;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
+                        ">
+                        Budget limit
+                        </p>
+                        <p style="
+                        margin: 4px 0 0;
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #111827;
+                        ">
+                        ${group.monthly_budget_cap} €
+                        </p>
+                    </div>
 
-                <p style="margin-top: 30px; color: #6c757d;">
-                    This is an automated notification from your VegaIT Expense Tracker.
-                </p>
-            </div>
+                    <div>
+                        <p style="
+                        margin: 0;
+                        font-size: 13px;
+                        color: #6b7280;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
+                        ">
+                        Current total
+                        </p>
+                        <p style="
+                        margin: 4px 0 0;
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #111827;
+                        ">
+                        ${totalAfter.toFixed(2)} €
+                        </p>
+                    </div>
+                    </div>
+
+                    <p style="
+                    margin: 0 0 32px;
+                    font-size: 15px;
+                    color: #374151;
+                    line-height: 1.65;
+                    ">
+                    Reviewing recent expenses or adjusting your budget now can help you stay in
+                    control for the rest of the month.
+                    </p>
+
+                    <div style="
+                    text-align: center;
+                    padding-top: 24px;
+                    border-top: 1px solid #e5e7eb;
+                    ">
+                    <p style="
+                        margin: 0;
+                        font-size: 12px;
+                        color: #9ca3af;
+                    ">
+                        Automated notification · VegaIT Expense Tracker
+                    </p>
+                    </div>
+                </div>
+                </div>
         `;
         return this.send(user.email,subject,html);
     }

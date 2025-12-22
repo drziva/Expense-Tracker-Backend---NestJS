@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
@@ -10,6 +10,10 @@ import { ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from '@n
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    @Get("me")
+    getMe(@Req() req) {
+        return req.user;
+    }
 
     @Public()
     @Post('signup')
