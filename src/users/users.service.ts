@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { UserId } from 'src/auth/user-id.decorator';
 
 @Injectable()
 export class UsersService {
@@ -41,5 +42,13 @@ export class UsersService {
     });
 
     return this.userRepo.save(user);
+  }
+  
+  async toggleNotifications(userId:number) {
+    const user = await this.userRepo.findOne({where:{id: userId}});
+    user!.budget_cap_notifications = !user?.budget_cap_notifications;
+
+    await this.userRepo.save(user!);
+    return true;
   }
 }
