@@ -12,6 +12,9 @@ export class LoginUserResponse {
 
   @ApiProperty({ example: false })
   premium: boolean;
+
+  @ApiProperty({ example: false })
+  notifications: boolean;
 }
 
 export class LoginResponse {

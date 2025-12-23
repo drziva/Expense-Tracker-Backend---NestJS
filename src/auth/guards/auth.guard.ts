@@ -43,7 +43,8 @@ export class AuthGuard implements CanActivate {
           sub: dbUser.id,
           username: dbUser.username,
           email: dbUser.email,
-          premium: dbUser.premium
+          premium: dbUser.premium,
+          notifications: dbUser.budget_cap_notifications
       }
       return true;
       } catch (error) { 

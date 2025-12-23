@@ -39,7 +39,8 @@ export class AuthService {
                 id: user.id,
                 username: user.username,
                 email: user.email,
-                premium: user.premium
+                premium: user.premium,
+                notifications: user.budget_cap_notifications
             }
         }
 
@@ -60,10 +61,11 @@ export class AuthService {
         }
         
         const payload = {
-                sub: user.id,
-                username: user.username,
-                email: user.email,
-                premium: user.premium
+            sub: user.id,
+            username: user.username,
+            email: user.email,
+            premium: user.premium,
+            notifications: user.budget_cap_notifications
         }
 
         const token = await this.jwtService.signAsync(payload);
@@ -74,7 +76,8 @@ export class AuthService {
                 id: payload.sub,
                 username: user.username,
                 email: user.email,
-                premium: user.premium
+                premium: user.premium,
+                notifications: user.budget_cap_notifications
             }
         }
 

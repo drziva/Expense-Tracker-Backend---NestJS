@@ -20,22 +20,35 @@ export class RemindersService {
     private readonly emailService: EmailService
   ) {}
 
-  async create(userId: number, dto: CreateReminderDto): Promise<ReminderResponse> {
-    try {
-      const reminder = this.reminderRepo.create({
-        type: dto.type,
-        weekday: dto.type === ReminderEnum.WEEKLY ? dto.weekday : null,
-        day_of_month: dto.type === ReminderEnum.MONTHLY ? dto.dayOfMonth : null,
+
+  async upsertByType(
+    userId: number,
+    type: ReminderEnum,
+    dto: UpdateReminderDto
+  ): Promise<ReminderResponse> {
+    let reminder = await this.reminderRepo.findOne({where:{user_id: userId, type}});
+
+    if(!reminder){
+      reminder = this.reminderRepo.create({
         user_id: userId,
-      });
-
-      await this.reminderRepo.save(reminder);
-
-      return this.toReminderResponse(reminder);
-    } catch(error){
-        console.error("Error creating reminder: ", error);
-      throw error;
+        type
+      })
     }
+    reminder.active = dto.active;
+
+    if(type === ReminderEnum.WEEKLY) {
+      reminder.weekday = dto.weekday!;
+      reminder.day_of_month = null
+    }
+
+    if(type === ReminderEnum.MONTHLY) {
+      reminder.day_of_month = dto.dayOfMonth!;
+      reminder.weekday = null
+    }
+
+    await this.reminderRepo.save(reminder);
+
+    return this.toReminderResponse(reminder);
   }
 
   async findAll(userId: number): Promise<ReminderResponse[]> {
@@ -46,54 +59,6 @@ export class RemindersService {
       throw new NotFoundException("No reminders were found")
     }
     return reminders.map(rem => this.toReminderResponse(rem))
-  }
-
-  async update(userId: number, id: number, dto: UpdateReminderDto): Promise<ReminderResponse> {
-    try {
-      const reminder = await this.reminderRepo.findOne({
-        where: { id, user_id: userId },
-      });
-      
-      if (!reminder) {
-        throw new NotFoundException('Reminder not found.');
-      }
-      reminder.active = dto.active;
-      reminder.type = dto.type; 
-      
-    if (dto.type === ReminderEnum.WEEKLY) {
-      reminder.weekday = dto.weekday ?? null;
-      reminder.day_of_month = null;
-    } else {
-      reminder.day_of_month = dto.dayOfMonth ?? null;
-      reminder.weekday = null;
-    }
-
-      await this.reminderRepo.save(reminder);
-
-      return this.toReminderResponse(reminder);
-  } catch(error){
-      console.error("Error updating reminder: ", error);
-      throw error
-  }
-
-  }
-
-  async delete(userId: number, id: number): Promise<DeleteReminderResponse> {
-    try{
-      const reminder = await this.reminderRepo.findOne({
-        where: { id, user_id: userId },
-      });
-
-      if (!reminder) {
-        throw new NotFoundException('Reminder not found.');
-      }
-      await this.reminderRepo.remove(reminder);
-      
-      return { success:true, id: id};}
-    catch(error){
-      console.error("Error deleting reminder: ", error);
-      throw error;
-    }
   }
 
   async sendReminderReportEmail(userId: number, from: Date, to: Date): Promise<void> {
