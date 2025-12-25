@@ -1,7 +1,7 @@
 import { ReminderReport } from "../reports.types";
 import { logoImageBASE64 } from "./image";
 
-const LOGO_BASE64 = `data:image/png;base64,${logoImageBASE64}`; // keep same logo if desired
+const LOGO_BASE64 = `data:image/png;base64,${logoImageBASE64}`;
 
 export function renderReminderReportTemplate(report: ReminderReport): string {
   const money = (n: number) =>

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Put, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -19,7 +19,7 @@ export class UsersController {
 
   @UseGuards(PremiumGuard)
   @Put('/notifications/toggle')
-  async toggleNotifications(@UserId() userId: number): Promise<boolean> {
+  async toggleNotifications( @UserId() userId: number ): Promise<boolean> {
     return await this.usersService.toggleNotifications(userId);
   }
 }

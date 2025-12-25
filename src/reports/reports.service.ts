@@ -33,7 +33,7 @@ export class ReportsService {
         const incomes = await this.incomesService.getForReport(userId, from, to);
 
         if(expenses.length === 0 && incomes.length === 0){
-            throw new NotFoundException("There aren't any incomes or expenses for generating the report")
+            throw new NotFoundException("No transactions were found for the selected time period")
         }
 
         const totalIncomes = this.sum(incomes);
@@ -69,9 +69,6 @@ export class ReportsService {
         to:Date
     ): Promise<ReminderReport> {
         const expenses = await this.expensesService.getForReport(userId,from,to);
-        if(expenses.length === 0){
-            throw new NotFoundException("No expenses were found for the user");
-        }
         const totalSpent = this.sum(expenses);
         const expenseGroupNames: Record<number,string> = await this.expenseGroupsService.getGroupsForUser(userId);
         const expensesForReport = this.toReportFormat(expenses,expenseGroupNames);
