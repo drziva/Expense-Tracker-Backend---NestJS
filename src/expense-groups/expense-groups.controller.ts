@@ -9,7 +9,6 @@ import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, A
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, ExpenseGroupResponse} from './dto/expense-groups-responses.dto';
 import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
-import { BudgetStatusDto } from './dto/budget-status.dto';
 
 @ApiTags('Expense Groups')
 @ApiBearerAuth()

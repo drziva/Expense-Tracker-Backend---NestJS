@@ -135,6 +135,50 @@ export class ExpensesService {
         return await this.expenseRepo.find({where});
     }
 
+    async getSummaryByDay(
+        userId: number,
+        from: Date,
+        to: Date
+        ): Promise<{ date: string; total: number }[]> {
+
+        if (from.getTime() > to.getTime()) {
+            throw new NotFoundException(
+            "Invalid date range: 'from' date must be before 'to' date"
+            );
+        }
+
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+            throw new NotFoundException("Invalid date format");
+        }
+
+        const result = await this.expenseRepo.query(
+            `
+            WITH RECURSIVE dates AS (
+            SELECT DATE(?) AS day
+            UNION ALL
+            SELECT DATE_ADD(day, INTERVAL 1 DAY)
+            FROM dates
+            WHERE day < DATE(?)
+            )
+            SELECT
+            dates.day AS date,
+            COALESCE(SUM(expense.amount), 0) AS total
+            FROM dates
+            LEFT JOIN expenses expense
+            ON DATE(expense.created_at) = dates.day
+            AND expense.user_id = ?
+            GROUP BY dates.day
+            ORDER BY dates.day ASC
+            `,
+            [from, to, userId]
+        );
+
+        return result.map((row) => ({
+            date: row.date.toISOString().split("T")[0],
+            total: Number(row.total),
+        }));
+    }
+
     private async checkBudgetCap(user: User,dto: CreateExpenseDto, group: ExpenseGroup): Promise<void> {
         const now = new Date();
             const lastSent = group.last_budget_alert;

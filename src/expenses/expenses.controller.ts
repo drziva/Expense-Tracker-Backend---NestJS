@@ -44,6 +44,18 @@ export class ExpensesController {
     return this.expensesService.getTotalExpensesValue(userId);
   }
 
+  @Get("summary")
+  @ApiOperation({ summary: "Get daily summary of expenses within a date range" })
+  async getSummaryByDay(
+    @UserId() userId: number,
+    @Query("from") from: string,
+    @Query("to") to: string
+  ): Promise<{ date: string, total: number }[]> {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    return this.expensesService.getSummaryByDay(userId, fromDate, toDate);
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Get a single expense by ID" })
   @ApiOkResponse({

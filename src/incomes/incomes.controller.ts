@@ -53,6 +53,24 @@ export class IncomesController {
     return this.incomesService.getTotalIncomesValue(userId);
   }
 
+  @Get("summary")
+  @ApiOperation({ summary: "Get daily summary of incomes within a date range" })
+  async getSummaryByDay(
+    @UserId() userId: number,
+    @Query("from") from: string,
+    @Query("to") to: string,
+    @Query("type") type: "regular" | "yearly"
+  ): Promise<{ date: string, total: number }[]> {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+
+    if(type === "yearly") {
+      return this.incomesService.getSummaryByMonth(userId, fromDate, toDate);
+    };
+
+    return this.incomesService.getSummaryByDay(userId, fromDate, toDate);
+  }
+
   @Get(":id")
   @ApiOperation({ summary: "Get a single income by ID" })
   @ApiOkResponse({
