@@ -5,6 +5,11 @@ export enum ExpenseSortOrder {
   DATE_DESC = 'date_desc',
 }
 
+export type ExpenseGroupSummary = {
+  groupName: string;
+  total: number;
+}
+
 export interface GroupQueryOptions {
     search?: string;
     sort?: ExpenseSortOrder;

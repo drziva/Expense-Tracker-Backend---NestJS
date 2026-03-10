@@ -6,7 +6,6 @@ import { UserId } from "src/auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from "@nestjs/swagger";
 import { GetExpensesQueryDto } from "./dto/get-expenses-query.dto";
-
 @ApiBearerAuth()
 @Controller("expenses")
 export class ExpensesController {
@@ -49,10 +48,16 @@ export class ExpensesController {
   async getSummaryByDay(
     @UserId() userId: number,
     @Query("from") from: string,
-    @Query("to") to: string
+    @Query("to") to: string,
+    @Query("type") type: "yearly" | "regular"
   ): Promise<{ date: string, total: number }[]> {
     const fromDate = new Date(from);
     const toDate = new Date(to);
+
+    if(type === "yearly"){
+      return this.expensesService.getSummaryByMonth(userId, fromDate, toDate);
+    }
+
     return this.expensesService.getSummaryByDay(userId, fromDate, toDate);
   }
 

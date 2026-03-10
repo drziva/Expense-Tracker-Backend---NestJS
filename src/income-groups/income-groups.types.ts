@@ -5,6 +5,11 @@ export enum IncomeGroupSortOrder {
     DATE_DESC = 'date_desc',
 }
 
+export type IncomeGroupSummary = {
+  groupName: string;
+  total: number;
+}
+
 export interface IncomeGroupQueryOptions {
     search?: string;
     sort?: IncomeGroupSortOrder;

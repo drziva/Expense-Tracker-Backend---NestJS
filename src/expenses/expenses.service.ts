@@ -179,6 +179,50 @@ export class ExpensesService {
         }));
     }
 
+    async getSummaryByMonth(
+        userId: number,
+        from: Date,
+        to: Date
+        ): Promise<{ date: string; total: number }[]> {
+
+        if (from.getTime() > to.getTime()) {
+            throw new NotFoundException(
+            "Invalid date range: 'from' date must be before 'to' date"
+            );
+        }
+
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+            throw new NotFoundException("Invalid date format");
+        }
+
+        const result = await this.expenseRepo.query(
+            `
+            WITH RECURSIVE months AS (
+            SELECT DATE_FORMAT(DATE(?), '%Y-%m-01') AS month_start
+            UNION ALL
+            SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+            FROM months
+            WHERE month_start < DATE_FORMAT(DATE(?), '%Y-%m-01')
+            )
+            SELECT
+            months.month_start AS date,
+            COALESCE(SUM(expense.amount), 0) AS total
+            FROM months
+            LEFT JOIN expenses expense
+            ON DATE_FORMAT(expense.created_at, '%Y-%m-01') = months.month_start
+            AND expense.user_id = ?
+            GROUP BY months.month_start
+            ORDER BY months.month_start ASC
+            `,
+            [from, to, userId]
+        );
+
+        return result.map((row) => ({
+            date: row.date,
+            total: Number(row.total),
+        }));
+    }
+
     private async checkBudgetCap(user: User,dto: CreateExpenseDto, group: ExpenseGroup): Promise<void> {
         const now = new Date();
             const lastSent = group.last_budget_alert;

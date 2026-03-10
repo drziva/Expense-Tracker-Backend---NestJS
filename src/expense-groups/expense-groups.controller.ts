@@ -9,6 +9,8 @@ import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, A
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, ExpenseGroupResponse} from './dto/expense-groups-responses.dto';
 import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
+import type { GetGroupTotalDto } from 'src/expense-groups/dto/expense-groups-requests.dto';
+import { ExpenseGroupSummary } from './expense-groups.types';
 
 @ApiTags('Expense Groups')
 @ApiBearerAuth()
@@ -34,6 +36,21 @@ export class ExpenseGroupsController {
             page: pageNum,
             limit: limitNum
         });
+    }
+
+    @Get("total-by-group")
+    async getTotalByGroup(
+        @UserId() userId: number,
+        @Query() query: GetGroupTotalDto
+    ): Promise<ExpenseGroupSummary[]> {
+
+        const to = query.to ? new Date(query.to) : new Date()
+
+        const from = query.from
+        ? new Date(query.from)
+        : new Date(new Date().setDate(new Date().getDate() - 30))
+
+        return this.expenseGroupsService.getTotalByGroup(userId, from, to)
     }
 
     @ApiOperation({ summary: 'Get budget usage for this group (current month).' })

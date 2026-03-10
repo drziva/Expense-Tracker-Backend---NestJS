@@ -8,6 +8,7 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { Expense } from 'src/expenses/expenses.entity';
 import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto.js';
 import { BudgetStatus, DeleteGroupResponse, ExpenseGroupResponse, GetGroupResponse } from './dto/expense-groups-responses.dto.js';
+import { ExpenseGroupSummary } from 'src/expense-groups/expense-groups.types.js';
 
 @Injectable()
 export class ExpenseGroupsService {
@@ -100,7 +101,31 @@ export class ExpenseGroupsService {
             console.error("Error creating expense group: ", error)
             throw error;
         }
-    }       
+    }
+           
+    async getTotalByGroup(userId: number, from: Date, to: Date): Promise<ExpenseGroupSummary[]> {
+        const result = await this.expenseGroupRepo
+
+        .createQueryBuilder("group")
+        .leftJoin(
+            "group.expenses",
+            "expense",
+            "expense.user_id = :userId AND expense.created_at >= :from AND expense.created_at <= :to",
+            { userId, from, to }
+        )
+        .where("group.user_id = :userId", { userId })
+        .select("group.id", "groupId")
+        .addSelect("group.name", "groupName")
+        .addSelect("COALESCE(SUM(expense.amount), 0)", "total")
+        .groupBy("group.id")
+        .orderBy("total", "DESC")
+        .getRawMany();
+
+        return result.map(row => ({
+            groupName: row.groupName,
+            total: Number(row.total)
+        }));
+    }
 
     async updateGroup(userId:number, groupId:number, dto: UpdateGroupDto): Promise<ExpenseGroupResponse> {
         const group = await this.validateGroup(userId, groupId);

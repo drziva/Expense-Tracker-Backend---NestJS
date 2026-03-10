@@ -21,8 +21,8 @@ export function renderReportTemplate(report: ReportResponse): string {
       --paper: #ffffff;
       --text-primary: #1f2937;
       --text-secondary: #4b5563;
-      --divider: rgba(0,0,0,0.08);
-      --accent: #6516eeff;
+      --divider: rgba(1, 255, 86, 0.08);
+      --accent: rgb(12, 216, 199);
       --radius: 12px;
     }
 
@@ -46,7 +46,7 @@ export function renderReportTemplate(report: ReportResponse): string {
       gap: 24px;
       padding-bottom: 20px;
       margin-bottom: 40px;
-      border-bottom: 1.5px solid #6504d462;
+      border-bottom: 1.5px solid rgba(12, 216, 199, 0.51)
     }
 
     .header img {
@@ -121,7 +121,7 @@ export function renderReportTemplate(report: ReportResponse): string {
       padding: 12px;
       font-size: 13px;
       font-weight: 600;
-      background: rgba(51, 2, 136, 0.06);
+      background: rgba(12, 216, 199, 0.10);
       color: #1f2937;
       border-bottom: 1px solid var(--divider);
     }
