@@ -111,7 +111,8 @@ export class ReportsController {
 
         res.set({
             "Content-Type": "application/pdf",
-            "Content-Disposition": "attachment; filename=expenses.pdf",
+            "Content-Disposition": `attachment; filename=expenses_report_${this.reportsService.timestamp()}.pdf`,
+            'Access-Control-Expose-Headers': 'Content-Disposition',
         });
 
         res.send(pdf);
@@ -129,7 +130,8 @@ export class ReportsController {
 
         res.set({
             "Content-Type": "application/pdf",
-            "Content-Disposition": "attachment; filename=incomes.pdf",
+            "Content-Disposition": `attachment; filename=incomes_report_${this.reportsService.timestamp()}.pdf`,
+            'Access-Control-Expose-Headers': 'Content-Disposition',
         });
 
         res.send(pdf);
