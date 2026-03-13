@@ -113,8 +113,11 @@ export class ReportsService {
         return this.htmlToPdf(html);
     }
 
-    async generateTransactionTablePdf(transactions: ExpenseResponse[] | IncomeResponse[], type:string): Promise<Buffer> {
-        const html = renderTransactionTableTemplate(transactions, type);
+    async generateTransactionTablePdf(userId: number, transactions: ExpenseResponse[] | IncomeResponse[], type:string, query: GetReportQueryDto ): Promise<Buffer> {
+        const expenseGroupNames: Record<number,string> = await this.expenseGroupsService.getGroupsForUser(userId);
+        const incomeGroupNames: Record<number,string> = await this.incomeGroupsService.getGroupsForUser(userId);
+        
+        const html = renderTransactionTableTemplate(transactions, type, query, type === "expense" ? expenseGroupNames : incomeGroupNames);
         return this.htmlToPdf(html);
     }
 

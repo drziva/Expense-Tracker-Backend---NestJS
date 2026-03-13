@@ -96,8 +96,8 @@ export class IncomeGroupsService {
         .leftJoin(
             "group.incomes",
             "income",
-            "income.user_id = :userId AND income.created_at >= :from AND income.created_at <= :to",
-            { userId, from, to }
+            "income.user_id = :userId", // AND income.created_at >= :from AND income.created_at <= :to
+            { userId, from, to } // FROM AND TO parameters currently not used in query, but left here for future implementation
         )
         .where("group.user_id = :userId", { userId })
         .select("group.id", "groupId")

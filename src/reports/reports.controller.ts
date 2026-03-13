@@ -107,7 +107,7 @@ export class ReportsController {
         @Res() res: Response,
     ): Promise<void> {
         const expenses = await this.expensesService.getFilteredForPdf(userId, query);
-        const pdf = await this.reportsService.generateTransactionTablePdf(expenses, "expense");
+        const pdf = await this.reportsService.generateTransactionTablePdf(userId, expenses, "expense", query);
 
         res.set({
             "Content-Type": "application/pdf",
@@ -118,14 +118,14 @@ export class ReportsController {
     }
 
     @Get("incomes/pdf")
-    @ApiOperation({ summary: "Export filtered expenses as PDF" })
+    @ApiOperation({ summary: "Export filtered incomes as PDF" })
     async exportIncomesPdf(
         @UserId() userId: number,
         @Query() query: GetExpensesQueryDto,
         @Res() res: Response,
     ): Promise<void> {
         const incomes = await this.incomesService.getFilteredForPdf(userId, query);
-        const pdf = await this.reportsService.generateTransactionTablePdf(incomes, "income");
+        const pdf = await this.reportsService.generateTransactionTablePdf(userId, incomes, "income", query);
 
         res.set({
             "Content-Type": "application/pdf",

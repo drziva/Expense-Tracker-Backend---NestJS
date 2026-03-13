@@ -110,7 +110,7 @@ export class ExpenseGroupsService {
         .leftJoin(
             "group.expenses",
             "expense",
-            "expense.user_id = :userId AND expense.created_at >= :from AND expense.created_at <= :to",
+            "expense.user_id = :userId", // AND expense.created_at >= :from AND expense.created_at <= :to
             { userId, from, to }
         )
         .where("group.user_id = :userId", { userId })

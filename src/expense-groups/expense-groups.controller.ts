@@ -48,7 +48,7 @@ export class ExpenseGroupsController {
 
         const from = query.from
         ? new Date(query.from)
-        : new Date(new Date().setDate(new Date().getDate() - 30))
+        : new Date(new Date().setDate(new Date().getDate() - 30)); // Default to last 30 days, dates currently not used in service function at all
 
         return this.expenseGroupsService.getTotalByGroup(userId, from, to)
     }
