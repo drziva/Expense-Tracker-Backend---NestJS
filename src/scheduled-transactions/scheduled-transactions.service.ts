@@ -11,6 +11,8 @@ import { UpdateScheduledTransactionDto } from './dto/update-scheduled-transactio
 import { DeleteScheduledTransactionResponse } from './dto/delete-scheduled-transaction.dto';
 import { IncomesService } from 'src/incomes/incomes.service';
 import { ExpensesService } from 'src/expenses/expenses.service';
+import { Expense } from 'src/expenses/expenses.entity';
+import { Income } from 'src/incomes/incomes.entity';
 
 @Injectable()
 export class ScheduledTransactionsService {
@@ -62,6 +64,7 @@ export class ScheduledTransactionsService {
     if(!transaction){
       throw new NotFoundException("The specified transaction was not found");
     }
+
     transaction.amount = dto.amount;
     transaction.date = dto.date;
     transaction.description = dto.description;

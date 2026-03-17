@@ -18,7 +18,3 @@ export enum ExpenseSort {
   AMOUNT_ASC = 'amount_asc',
 }
 
-export type ExpenseGroupSummary = {
-  groupName: string;
-  total: number;
-}

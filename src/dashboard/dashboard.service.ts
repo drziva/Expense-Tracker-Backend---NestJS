@@ -6,7 +6,6 @@ import { IncomeSort } from 'src/incomes/incomes.types';
 import { DashboardResponse } from './dto/dashboard-responses.dto';
 import { Income } from 'src/incomes/incomes.entity';
 import { Repository } from 'typeorm';
-import { Expense } from 'src/expenses/expenses.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
