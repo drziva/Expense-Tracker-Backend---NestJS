@@ -7,13 +7,15 @@ import { UsersModule } from 'src/users/users.module';
 import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { ExpenseGroupsModule } from 'src/expense-groups/expense-groups.module';
 import { EmailModule } from 'src/email/email.module';
+import { FirebaseModule } from 'src/firebase/firebase.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Expense, ExpenseGroup]),
     UsersModule,
     ExpenseGroupsModule,
-    EmailModule
+    EmailModule,
+    FirebaseModule
   ],
   controllers: [ExpensesController],
   providers: [ExpensesService],

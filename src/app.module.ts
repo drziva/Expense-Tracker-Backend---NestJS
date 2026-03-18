@@ -14,6 +14,7 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { ScheduledTransactionsModule } from './scheduled-transactions/scheduled-transactions.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import config from './config';
+import { FirebaseModule } from './firebase/firebase.module';
 
 
 @Module({
@@ -46,7 +47,8 @@ import config from './config';
     RemindersModule,
     EmailModule,
     ScheduledTransactionsModule,
-    DashboardModule
+    DashboardModule,
+    FirebaseModule
   ],
 })
 export class AppModule {}

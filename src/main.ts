@@ -11,6 +11,8 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
+  app.setGlobalPrefix('api');
   
   const config = new DocumentBuilder()
     .setTitle('Expense Tracker API')

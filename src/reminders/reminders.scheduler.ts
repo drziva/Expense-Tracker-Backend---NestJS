@@ -6,6 +6,7 @@ import { Reminder } from './reminders.entity';
 import { ReminderEnum } from './reminders-types';
 import { RemindersService } from './reminders.service';
 import { UsersService } from 'src/users/users.service';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class RemindersScheduler {
@@ -14,6 +15,7 @@ export class RemindersScheduler {
     private readonly reminderRepo: Repository<Reminder>,
     private readonly remindersService: RemindersService, 
     private readonly usersService: UsersService,
+    private readonly firebaseService: FirebaseService,
     private readonly logger: Logger
   ) {}
 
@@ -91,5 +93,10 @@ export class RemindersScheduler {
       from,
       to
     );
+
+    await this.firebaseService.sendNotificationToUser(reminder.user_id, {
+      title: "Your financial report is ready!",
+      body: `Your reminder report for the period from ${from.toLocaleDateString()} to ${to.toLocaleDateString()} has been sent to your email.`
+    });
   }
 }

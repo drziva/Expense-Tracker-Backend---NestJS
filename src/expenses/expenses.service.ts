@@ -10,6 +10,7 @@ import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { UsersService } from 'src/users/users.service';
 import { EmailService } from 'src/email/email.service';
 import { User } from 'src/users/user.entity';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class ExpensesService {
@@ -19,7 +20,8 @@ export class ExpensesService {
         @InjectRepository(ExpenseGroup)
         private readonly groupRepo: Repository<ExpenseGroup>,
         private readonly usersService: UsersService,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly firebaseService: FirebaseService
     ){}
         
     async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
@@ -41,7 +43,7 @@ export class ExpensesService {
                 return this.toExpenseResponse(saved);
             }
 
-            await this.checkBudgetCap(user,dto,group);
+            await this.checkBudgetCap(user, dto, group);
 
             return this.toExpenseResponse(saved);
         } catch (error) {
@@ -241,11 +243,15 @@ export class ExpensesService {
                 created_at: MoreThanOrEqual(startOfMonth)
             }) ?? 0;
             if(total > group.monthly_budget_cap!){
-                await this.emailService.sendBudgetCapAlert(user, group, total);
+                //DISABLED FOR NOW, SHOULD BE REPLACED BY FIREBASE NOTIFICATIONS
+                //await this.emailService.sendBudgetCapAlert(user, group, total); 
+                await this.firebaseService.sendNotificationToUser(user.id, {
+                    title: "Budget Cap Alert",
+                    body: `You have exceeded the budget cap for ${group.name}. Total this month: ${total.toFixed(2)} €.`
+                });
                 group.last_budget_alert = now;
                 await this.groupRepo.save(group);
             }
-            
         }
     }
 

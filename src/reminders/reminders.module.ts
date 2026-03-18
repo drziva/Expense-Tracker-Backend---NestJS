@@ -7,13 +7,15 @@ import { Reminder } from './reminders.entity';
 import { ReportsModule } from 'src/reports/reports.module';
 import { EmailModule } from 'src/email/email.module';
 import { RemindersScheduler } from './reminders.scheduler';
+import { FirebaseModule } from 'src/firebase/firebase.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Reminder]),
     UsersModule,
     ReportsModule,
-    EmailModule
+    EmailModule,
+    FirebaseModule
   ],
   providers: [
     RemindersService,
