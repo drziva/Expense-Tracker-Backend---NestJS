@@ -21,16 +21,11 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers['authorization'];   
 
-    if (!authHeader) {
-      throw new UnauthorizedException();
-    }
-
-    const token = authHeader.split(' ')[1];
+    const token = request.cookies?.accessToken;
 
     if(!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("No access token found");
     }
 
     try {
