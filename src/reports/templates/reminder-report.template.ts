@@ -21,8 +21,8 @@ export function renderReminderReportTemplate(report: ReminderReport): string {
       --paper: #ffffff;
       --text-primary: #1f2937;
       --text-secondary: #4b5563;
-      --divider: rgba(0,0,0,0.08);
-      --accent: #6516eeff;
+      --divider: rgba(1, 255, 86, 0.08);
+      --accent: #b3d80cff;
       --radius: 12px;
     }
 

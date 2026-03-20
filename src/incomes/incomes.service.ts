@@ -57,7 +57,94 @@ export class IncomesService {
         };
     }
 
-    
+    async getSummaryByDay(
+        userId: number,
+        from: Date,
+        to: Date
+        ): Promise<{ date: string; total: number }[]> {
+
+        if (from.getTime() > to.getTime()) {
+            throw new NotFoundException(
+            "Invalid date range: 'from' date must be before 'to' date"
+            );
+        }
+
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+            throw new NotFoundException("Invalid date format");
+        }
+
+        const result = await this.incomeRepo.query(
+            `
+            WITH RECURSIVE dates AS (
+            SELECT DATE(?) AS day
+            UNION ALL
+            SELECT DATE_ADD(day, INTERVAL 1 DAY)
+            FROM dates
+            WHERE day < DATE(?)
+            )
+            SELECT
+            dates.day AS date,
+            COALESCE(SUM(income.amount), 0) AS total
+            FROM dates
+            LEFT JOIN incomes income
+            ON DATE(income.created_at) = dates.day
+            AND income.user_id = ?
+            GROUP BY dates.day
+            ORDER BY dates.day ASC
+            `,
+            [from, to, userId]
+        );
+
+        return result.map((row) => ({
+            date: row.date.toISOString().split("T")[0],
+            total: Number(row.total),
+        }));
+    }
+
+    async getSummaryByMonth(
+        userId: number,
+        from: Date,
+        to: Date
+        ): Promise<{ date: string; total: number }[]> {
+
+        if (from.getTime() > to.getTime()) {
+            throw new NotFoundException(
+            "Invalid date range: 'from' date must be before 'to' date"
+            );
+        }
+
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+            throw new NotFoundException("Invalid date format");
+        }
+
+        const result = await this.incomeRepo.query(
+            `
+            WITH RECURSIVE months AS (
+            SELECT DATE_FORMAT(DATE(?), '%Y-%m-01') AS month_start
+            UNION ALL
+            SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+            FROM months
+            WHERE month_start < DATE_FORMAT(DATE(?), '%Y-%m-01')
+            )
+            SELECT
+            months.month_start AS date,
+            COALESCE(SUM(income.amount), 0) AS total
+            FROM months
+            LEFT JOIN incomes income
+            ON DATE_FORMAT(income.created_at, '%Y-%m-01') = months.month_start
+            AND income.user_id = ?
+            GROUP BY months.month_start
+            ORDER BY months.month_start ASC
+            `,
+            [from, to, userId]
+        );
+
+        return result.map((row) => ({
+            date: row.date,
+            total: Number(row.total),
+        }));
+    }
+
     async getFilteredForPdf(userId, options): Promise<IncomeResponse[]> {
         const {where, order} = this.buildSortAndFilter(userId,options);
         const expenses = await this.incomeRepo.find({where, order, relations:["group"]});

@@ -17,3 +17,4 @@ export enum ExpenseSort {
   AMOUNT_DESC = 'amount_desc',
   AMOUNT_ASC = 'amount_asc',
 }
+

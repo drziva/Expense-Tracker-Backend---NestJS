@@ -5,6 +5,8 @@ import { Income } from 'src/incomes/incomes.entity';
 import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 import { Reminder } from 'src/reminders/reminders.entity';
 import { ScheduledTransaction } from 'src/scheduled-transactions/scheduled-transactions.entity';
+import { FirebaseToken } from 'src/firebase/firebase.entity';
+import { RefreshToken } from 'src/auth/refresh-token.entity';
 
 @Entity("user")
 export class User {
@@ -43,4 +45,10 @@ export class User {
 
   @OneToMany( ()=> ScheduledTransaction, schedTransaction => schedTransaction.user)
   scheduledTransactions: ScheduledTransaction
+
+  @OneToMany(() => FirebaseToken, firebaseToken => firebaseToken.user)
+  firebaseTokens: FirebaseToken[]
+
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+  refreshTokens: RefreshToken[]
 }

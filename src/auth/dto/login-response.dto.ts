@@ -17,13 +17,13 @@ export class LoginUserResponse {
   notifications: boolean;
 }
 
-export class LoginResponse {
-  @ApiProperty({
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: 'JWT access token'
-  })
+export class LoginServiceResponse {
   accessToken: string;
+  refreshToken: string;
+  user: LoginUserResponse;
+}
 
+export class LoginResponse {
   @ApiProperty({ type: () => LoginUserResponse })
   user: LoginUserResponse;
 }

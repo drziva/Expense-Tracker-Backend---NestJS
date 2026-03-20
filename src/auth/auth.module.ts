@@ -6,10 +6,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshToken } from './refresh-token.entity';
 
 @Module({
   imports: [
     UsersModule,
+    TypeOrmModule.forFeature([RefreshToken]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({

@@ -18,7 +18,7 @@ export class Expense {
   @Column({ type: "text" })
   description: string;
 
-  @Column({ type: "decimal", precision: 10, scale: 2 })
+  @Column({ type: "decimal", precision: 14, scale: 2 })
   amount: number;
 
   @Column()

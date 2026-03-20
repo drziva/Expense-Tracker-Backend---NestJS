@@ -8,6 +8,7 @@ import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
 import { Income } from 'src/incomes/incomes.entity';
 import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
 import { IncomeGroupQueryOptions } from './income-groups.types';
+import { ExpenseGroupSummary } from 'src/expense-groups/expense-groups.types';
 
 @Injectable()
 export class IncomeGroupsService {
@@ -87,6 +88,29 @@ export class IncomeGroupsService {
             totalItems: total,
             totalPages: Math.ceil(total / limit),
         };
+    }
+    
+    async getTotalByGroup(userId: number, from: Date, to: Date): Promise<ExpenseGroupSummary[]> {
+        const result = await this.incomeGroupRepo
+        .createQueryBuilder("group")
+        .leftJoin(
+            "group.incomes",
+            "income",
+            "income.user_id = :userId", // AND income.created_at >= :from AND income.created_at <= :to
+            { userId, from, to } // FROM AND TO parameters currently not used in query, but left here for future implementation
+        )
+        .where("group.user_id = :userId", { userId })
+        .select("group.id", "groupId")
+        .addSelect("group.name", "groupName")
+        .addSelect("COALESCE(SUM(income.amount), 0)", "total")
+        .groupBy("group.id")
+        .orderBy("total", "DESC")
+        .getRawMany();
+
+        return result.map(row => ({
+            groupName: row.groupName,
+            total: Number(row.total)
+        }));
     }
 
     async createGroup(userId: number, dto: CreateIncomeGroupDto): Promise<IncomeGroupResponse> {

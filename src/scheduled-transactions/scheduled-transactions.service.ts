@@ -11,6 +11,8 @@ import { UpdateScheduledTransactionDto } from './dto/update-scheduled-transactio
 import { DeleteScheduledTransactionResponse } from './dto/delete-scheduled-transaction.dto';
 import { IncomesService } from 'src/incomes/incomes.service';
 import { ExpensesService } from 'src/expenses/expenses.service';
+import { Expense } from 'src/expenses/expenses.entity';
+import { Income } from 'src/incomes/incomes.entity';
 
 @Injectable()
 export class ScheduledTransactionsService {
@@ -27,11 +29,7 @@ export class ScheduledTransactionsService {
   ) {}
 
   async getAll(userId: number): Promise<ScheduledTransactionResponse[]> {
-<<<<<<< HEAD
-    const transactions = await this.scheduledTransactionsRepo.find({ where: { user_id:userId }, relations:["group"] });
-=======
     const transactions = await this.scheduledTransactionsRepo.find({ where: { user_id:userId }, relations:["income_group","expense_group"] });
->>>>>>> e29ffcf1d585809e569eb1553582c458883a827a
     return transactions.map(tr=>(this.toScheduledTransactionResponse(tr)));
   }
 
@@ -66,6 +64,7 @@ export class ScheduledTransactionsService {
     if(!transaction){
       throw new NotFoundException("The specified transaction was not found");
     }
+
     transaction.amount = dto.amount;
     transaction.date = dto.date;
     transaction.description = dto.description;
@@ -169,11 +168,7 @@ export class ScheduledTransactionsService {
       incomeGroupId: schedTransaction.income_group_id,
       expenseGroupId: schedTransaction.expense_group_id,
       expenseGroupName: schedTransaction.expense_group?.name,
-<<<<<<< HEAD
-      incomeGroupName: schedTransaction.income_group?.name
-=======
       incomeGroupName: schedTransaction.income_group?.name,
->>>>>>> e29ffcf1d585809e569eb1553582c458883a827a
     }
   }
 }

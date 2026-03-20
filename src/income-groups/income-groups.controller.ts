@@ -9,6 +9,8 @@ import {
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
 import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
 import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
+import { IncomeGroupSummary } from './income-groups.types';
+import type { GetIncomeGroupSummaryDto } from './dto/income-groups-requests.dto';
 
 @ApiTags('Income Groups')
 @ApiBearerAuth()
@@ -35,6 +37,20 @@ export class IncomeGroupsController {
       page: pageNum,
       limit: limitNum,
     });
+  }
+
+  @Get("total-by-group")
+  async getTotalByGroup(
+    @UserId() userId: number,
+    @Query() query: GetIncomeGroupSummaryDto
+  ): Promise<IncomeGroupSummary[]> {
+    const to = query.to ? new Date(query.to) : new Date()
+    
+    const from = query.from
+    ? new Date(query.from)
+    : new Date(new Date().setDate(new Date().getDate() - 30))    
+
+    return this.incomeGroupsService.getTotalByGroup(userId, from, to);
   }
 
   @Get(':id/incomes')

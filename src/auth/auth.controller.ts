@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponse } from './dto/login-response.dto';
 import { Public } from './public-decorator';
 import { ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { UserId } from './user-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -23,9 +24,28 @@ export class AuthController {
         type: LoginResponse
     })
     async createUser(
-        @Body() input: SignUpDto
+        @Body() input: SignUpDto,
+        @Res({passthrough: true}) res
     ): Promise<LoginResponse> {
-        return this.authService.signUp(input);
+        const data = await this.authService.signUp(input);
+
+        res.cookie('refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+
+        res.cookie('accessToken', data.accessToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 20 * 60 * 1000,            
+        })
+
+        return {
+            user: data.user
+        };
     }
 
 
@@ -38,8 +58,95 @@ export class AuthController {
     })
     @ApiResponse({ status: 401, description: "Invalid credentials" })
     async login(
+        @Res({passthrough: true}) res,
         @Body() loginDto: LoginDto
     ): Promise<LoginResponse> {
-        return this.authService.login(loginDto);
+        const data = await this.authService.login(loginDto);
+
+        res.cookie('refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        res.cookie('accessToken', data.accessToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000,            
+        })        
+
+        return {
+            user: data.user
+        };
+    }
+
+    @Public()
+    @Post('refresh')
+    @ApiOperation({ summary: "Refresh access token" })
+    @ApiOkResponse({ description: "Access token refreshed successfully" })
+    async refresh(
+        @Req() req,
+        @Res({passthrough: true}) res
+    ) {
+        const refreshToken = req.cookies?.refreshToken;
+
+        if(!refreshToken) {
+            throw new UnauthorizedException('No refresh token found');
+        }
+
+        const data = await this.authService.refresh(refreshToken);
+
+        res.cookie('refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+
+        res.cookie('accessToken', data.accessToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 20 * 60 * 1000,            
+        })
+        
+        const response: LoginResponse = {
+            user: data.user
+        };
+
+        return response;
+    }
+
+    @Post('logout')
+    @ApiOperation({ summary: "User logout" })
+    @ApiOkResponse({ description: "User logged out successfully" })
+    async logout(
+        @UserId() userId: number,
+        @Req() req,
+        @Res({passthrough: true}) res
+    ) {
+        const refreshToken = req.cookies?.refreshToken;
+
+        if(!refreshToken) {
+            return { success: true };
+        }
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax"
+        })
+        
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',        
+        })
+
+        await this.authService.logout(userId, refreshToken);
+
+        return { success: true }
     }
 }

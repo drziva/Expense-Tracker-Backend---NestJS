@@ -10,6 +10,7 @@ import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
 import { UsersService } from 'src/users/users.service';
 import { EmailService } from 'src/email/email.service';
 import { User } from 'src/users/user.entity';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class ExpensesService {
@@ -19,7 +20,8 @@ export class ExpensesService {
         @InjectRepository(ExpenseGroup)
         private readonly groupRepo: Repository<ExpenseGroup>,
         private readonly usersService: UsersService,
-        private readonly emailService: EmailService
+        private readonly emailService: EmailService,
+        private readonly firebaseService: FirebaseService
     ){}
         
     async create(dto: CreateExpenseDto, userId: number): Promise<ExpenseResponse> {
@@ -41,7 +43,7 @@ export class ExpensesService {
                 return this.toExpenseResponse(saved);
             }
 
-            await this.checkBudgetCap(user,dto,group);
+            await this.checkBudgetCap(user, dto, group);
 
             return this.toExpenseResponse(saved);
         } catch (error) {
@@ -135,6 +137,94 @@ export class ExpensesService {
         return await this.expenseRepo.find({where});
     }
 
+    async getSummaryByDay(
+        userId: number,
+        from: Date,
+        to: Date
+        ): Promise<{ date: string; total: number }[]> {
+
+        if (from.getTime() > to.getTime()) {
+            throw new NotFoundException(
+            "Invalid date range: 'from' date must be before 'to' date"
+            );
+        }
+
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+            throw new NotFoundException("Invalid date format");
+        }
+
+        const result = await this.expenseRepo.query(
+            `
+            WITH RECURSIVE dates AS (
+            SELECT DATE(?) AS day
+            UNION ALL
+            SELECT DATE_ADD(day, INTERVAL 1 DAY)
+            FROM dates
+            WHERE day < DATE(?)
+            )
+            SELECT
+            dates.day AS date,
+            COALESCE(SUM(expense.amount), 0) AS total
+            FROM dates
+            LEFT JOIN expenses expense
+            ON DATE(expense.created_at) = dates.day
+            AND expense.user_id = ?
+            GROUP BY dates.day
+            ORDER BY dates.day ASC
+            `,
+            [from, to, userId]
+        );
+
+        return result.map((row) => ({
+            date: row.date.toISOString().split("T")[0],
+            total: Number(row.total),
+        }));
+    }
+
+    async getSummaryByMonth(
+        userId: number,
+        from: Date,
+        to: Date
+        ): Promise<{ date: string; total: number }[]> {
+
+        if (from.getTime() > to.getTime()) {
+            throw new NotFoundException(
+            "Invalid date range: 'from' date must be before 'to' date"
+            );
+        }
+
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+            throw new NotFoundException("Invalid date format");
+        }
+
+        const result = await this.expenseRepo.query(
+            `
+            WITH RECURSIVE months AS (
+            SELECT DATE_FORMAT(DATE(?), '%Y-%m-01') AS month_start
+            UNION ALL
+            SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+            FROM months
+            WHERE month_start < DATE_FORMAT(DATE(?), '%Y-%m-01')
+            )
+            SELECT
+            months.month_start AS date,
+            COALESCE(SUM(expense.amount), 0) AS total
+            FROM months
+            LEFT JOIN expenses expense
+            ON DATE_FORMAT(expense.created_at, '%Y-%m-01') = months.month_start
+            AND expense.user_id = ?
+            GROUP BY months.month_start
+            ORDER BY months.month_start ASC
+            `,
+            [from, to, userId]
+        );
+
+        return result.map((row) => ({
+            date: row.date,
+            total: Number(row.total),
+        }));
+    }
+
     private async checkBudgetCap(user: User,dto: CreateExpenseDto, group: ExpenseGroup): Promise<void> {
         const now = new Date();
             const lastSent = group.last_budget_alert;
@@ -153,11 +243,15 @@ export class ExpensesService {
                 created_at: MoreThanOrEqual(startOfMonth)
             }) ?? 0;
             if(total > group.monthly_budget_cap!){
-                await this.emailService.sendBudgetCapAlert(user, group, total);
+                //DISABLED FOR NOW, SHOULD BE REPLACED BY FIREBASE NOTIFICATIONS
+                //await this.emailService.sendBudgetCapAlert(user, group, total); 
+                await this.firebaseService.sendNotificationToUser(user.id, {
+                    title: "Budget Cap Alert",
+                    body: `You have exceeded the budget cap for ${group.name}. Total this month: ${total.toFixed(2)} €.`
+                });
                 group.last_budget_alert = now;
                 await this.groupRepo.save(group);
             }
-            
         }
     }
 
