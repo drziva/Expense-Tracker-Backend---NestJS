@@ -63,19 +63,7 @@ export class AuthController {
     ): Promise<LoginResponse> {
         const data = await this.authService.login(loginDto);
 
-        res.cookie('refreshToken', data.refreshToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        });
-
-        res.cookie('accessToken', data.accessToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000,            
-        })        
+        this.setTokens(res, data.accessToken, data.refreshToken);
 
         return {
             user: data.user
@@ -96,19 +84,7 @@ export class AuthController {
     ): Promise<LoginResponse> {
         const data = await this.authService.googleLogin(token);
 
-        res.cookie('refreshToken', data.refreshToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        });
-
-        res.cookie('accessToken', data.accessToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000,            
-        })        
+        this.setTokens(res, data.accessToken, data.refreshToken);
 
         return {
             user: data.user
@@ -131,19 +107,7 @@ export class AuthController {
 
         const data = await this.authService.refresh(refreshToken);
 
-        res.cookie('refreshToken', data.refreshToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
-
-        res.cookie('accessToken', data.accessToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 20 * 60 * 1000,            
-        })
+        this.setTokens(res, data.accessToken, data.refreshToken);
         
         const response: LoginResponse = {
             user: data.user
@@ -181,5 +145,21 @@ export class AuthController {
         await this.authService.logout(userId, refreshToken);
 
         return { success: true }
+    }
+
+    private setTokens(res, accessToken, refreshToken) {
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 20 * 60 * 1000,            
+        })
     }
 }
