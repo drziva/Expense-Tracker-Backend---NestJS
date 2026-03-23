@@ -35,6 +35,9 @@ export class User {
   @Column({ nullable: true })
   providerId: string
 
+  @Column({ default: false })
+  is_welcomed: boolean;
+
   @OneToMany(() => ExpenseGroup, group => group.user)
   expenseGroups: ExpenseGroup[];
 

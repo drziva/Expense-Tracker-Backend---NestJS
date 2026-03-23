@@ -6,6 +6,7 @@ import { LoginResponse } from './dto/login-response.dto';
 import { Public } from './public-decorator';
 import { ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { UserId } from './user-id.decorator';
+import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from './auth.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -29,19 +30,7 @@ export class AuthController {
     ): Promise<LoginResponse> {
         const data = await this.authService.signUp(input);
 
-        res.cookie('refreshToken', data.refreshToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
-
-        res.cookie('accessToken', data.accessToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 20 * 60 * 1000,            
-        })
+        this.setTokens(res, data.accessToken, data.refreshToken);
 
         return {
             user: data.user
@@ -148,18 +137,8 @@ export class AuthController {
     }
 
     private setTokens(res, accessToken, refreshToken) {
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: false, // Set to true in production with HTTPS
-            sameSite: 'lax',
-            maxAge: 20 * 60 * 1000,            
-        })
+        res.cookie('accessToken', accessToken, ACCESS_TOKEN_COOKIE_OPTIONS)
     }
 }

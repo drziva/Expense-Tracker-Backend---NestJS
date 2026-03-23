@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { GoogleAuthService } from './google/google.auth.service';
 import { AuthProviders } from 'src/users/users.types';
+import { ACCESS_TOKEN_EXPIRES_IN, REFRESH_TOKEN_COOKIE_OPTIONS } from './auth.constants';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +39,7 @@ export class AuthService {
         
         const payload = this.userToPayload(user);
 
-        const accessToken = await this.jwtService.signAsync(payload, {expiresIn: "15m"});
+        const accessToken = await this.jwtService.signAsync(payload, {expiresIn: ACCESS_TOKEN_EXPIRES_IN});
         const refreshToken = this.generateRefreshToken();
         const hashedRefreshToken = await this.hashToken(refreshToken);
 
@@ -93,10 +94,10 @@ export class AuthService {
         let user = await this.usersService.findByEmail(googleUser.email);
 
         if(!user) {
-            user = await this.usersService.createUser(
-                googleUser.name, 
-                randomBytes(16).toString('hex'), // Generate a random password
-                googleUser.email
+            user = await this.usersService.createGoogleUser(
+                googleUser.email, 
+                googleUser.providerId, 
+                googleUser.name
             );
         }
 
@@ -167,7 +168,7 @@ export class AuthService {
         const payload = this.userToPayload(user);
 
         const accessToken = await this.jwtService.signAsync(payload, {
-            expiresIn: "15m"
+            expiresIn: ACCESS_TOKEN_EXPIRES_IN
         });
 
         return {
@@ -191,7 +192,8 @@ export class AuthService {
             username: user.username,
             email: user.email,
             premium: user.premium,
-            notifications: user.budget_cap_notifications
+            notifications: user.budget_cap_notifications,
+            welcomed: user.is_welcomed
          }
     }
 
@@ -201,7 +203,8 @@ export class AuthService {
             username: payload.username,
             email: payload.email,
             premium: payload.premium,
-            notifications: payload.notifications
+            notifications: payload.notifications,
+            welcomed: payload.isWelcomed
         }
     }
 
@@ -209,7 +212,7 @@ export class AuthService {
         return {
             user_id: userId,
             token,
-            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+            expires_at: new Date(Date.now() + REFRESH_TOKEN_COOKIE_OPTIONS.maxAge)
         }
     }
 
