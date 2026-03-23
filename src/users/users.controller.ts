@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Put, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -16,6 +16,13 @@ export class UsersController {
   getUsers(): Promise<User[]> {
     return this.usersService.findAll();
   }
+
+  @Put('/welcomed/toggle')
+  async toggleWelcomed(
+    @UserId() userId
+  ) {
+    return await this.usersService.toggleWelcomed(userId);
+  }  
 
   @UseGuards(PremiumGuard)
   @Put('/notifications/toggle')

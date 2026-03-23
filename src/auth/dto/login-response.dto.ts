@@ -15,6 +15,9 @@ export class LoginUserResponse {
 
   @ApiProperty({ example: false })
   notifications: boolean;
+
+  @ApiProperty({ example: true})
+  welcomed: boolean;
 }
 
 export class LoginServiceResponse {
