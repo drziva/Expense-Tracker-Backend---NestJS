@@ -83,6 +83,39 @@ export class AuthController {
     }
 
     @Public()
+    @Post("google")
+    @ApiOperation({ summary: "Login with Google" })
+    @ApiOkResponse({
+        description: "Logged in with Google successfully",
+        type: LoginResponse
+    })
+    @ApiResponse({ status: 401, description: "Invalid Google ID Token" })
+    async googleLogin(
+        @Res({passthrough: true}) res,
+        @Body('credential') token: string
+    ): Promise<LoginResponse> {
+        const data = await this.authService.googleLogin(token);
+
+        res.cookie('refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        res.cookie('accessToken', data.accessToken, {
+            httpOnly: true,
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000,            
+        })        
+
+        return {
+            user: data.user
+        };
+    }
+
+    @Public()
     @Post('refresh')
     @ApiOperation({ summary: "Refresh access token" })
     @ApiOkResponse({ description: "Access token refreshed successfully" })

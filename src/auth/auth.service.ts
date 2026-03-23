@@ -4,18 +4,21 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import { LoginResponse, LoginServiceResponse, LoginUserResponse } from './dto/login-response.dto';
+import { LoginServiceResponse } from './dto/login-response.dto';
 import { randomBytes } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshToken } from './refresh-token.entity';
+import { RefreshToken } from './entities/refresh-token.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
+import { GoogleAuthService } from './google/google.auth.service';
+import { AuthProviders } from 'src/users/users.types';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(RefreshToken)
         private readonly refreshTokenRepo: Repository<RefreshToken>,
+        private readonly googleAuthService: GoogleAuthService,
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
     ) {}
@@ -63,14 +66,9 @@ export class AuthService {
             throw new  UnauthorizedException('Invalid Credentials');
         }
         
+        const { accessToken, refreshToken } = await this.issueTokens(user);
+
         const payload = this.userToPayload(user);
-
-        const accessToken = await this.jwtService.signAsync(payload, {expiresIn: "15m"});
-        
-        const refreshToken= this.generateRefreshToken();
-        const hashedRefreshToken = await this.hashToken(refreshToken);
-
-        await this.refreshTokenRepo.save(this.refreshTokenPayload(user.id, hashedRefreshToken));
 
         const response: LoginServiceResponse = {
             accessToken,
@@ -79,6 +77,44 @@ export class AuthService {
         }
 
         return response
+    }
+
+    async googleLogin(token: string) {
+        if(!token) {
+            throw new UnauthorizedException("Google ID Token Not Found");
+        }
+
+        const googleUser = await this.googleAuthService.verifyIdToken(token);
+
+        if(!googleUser || !googleUser.email || !googleUser.providerId || !googleUser.name) {
+            throw new UnauthorizedException("Invalid Google ID Token");
+        }
+
+        let user = await this.usersService.findByEmail(googleUser.email);
+
+        if(!user) {
+            user = await this.usersService.createUser(
+                googleUser.name, 
+                randomBytes(16).toString('hex'), // Generate a random password
+                googleUser.email
+            );
+        }
+
+        if(user && user.provider !== AuthProviders.Google) {
+            user.provider = AuthProviders.Google;
+            user.providerId = googleUser.providerId;
+            await this.usersService.updateUser(user);
+        }
+
+        const { accessToken, refreshToken } = await this.issueTokens(user);
+
+        const payload = this.userToPayload(user);
+
+        return {
+            accessToken,
+            refreshToken,
+            user: this.payloadToUser(payload)
+        }
     }
 
     async logout(userId: number, refreshToken: string): Promise<void> {
@@ -175,5 +211,18 @@ export class AuthService {
             token,
             expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
         }
+    }
+
+    private async issueTokens(user: User): Promise<{ accessToken: string, refreshToken: string}> {
+        const payload = this.userToPayload(user);
+
+        const accessToken = await this.jwtService.signAsync(payload, {expiresIn: "15m"});
+        
+        const refreshToken= this.generateRefreshToken();
+        const hashedRefreshToken = await this.hashToken(refreshToken);
+
+        await this.refreshTokenRepo.save(this.refreshTokenPayload(user.id, hashedRefreshToken));
+
+        return { accessToken, refreshToken };
     }
 }

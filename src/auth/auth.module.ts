@@ -7,7 +7,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RefreshToken } from './refresh-token.entity';
+import { RefreshToken } from './entities/refresh-token.entity';
+import { GoogleAuthService } from './google/google.auth.service';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RefreshToken } from './refresh-token.entity';
   ],
   providers: [
     AuthService,
+    GoogleAuthService,
     { 
       provide: APP_GUARD,
       useClass: AuthGuard 

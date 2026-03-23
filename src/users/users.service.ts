@@ -43,6 +43,10 @@ export class UsersService {
 
     return this.userRepo.save(user);
   }
+
+  async updateUser(user: User): Promise<User> {
+    return this.userRepo.save(user);
+  }
   
   async toggleNotifications(userId:number) {
     const user = await this.userRepo.findOne({where:{id: userId}});

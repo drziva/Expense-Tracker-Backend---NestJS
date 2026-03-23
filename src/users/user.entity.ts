@@ -6,7 +6,8 @@ import { IncomeGroup } from 'src/income-groups/income-groups.entity';
 import { Reminder } from 'src/reminders/reminders.entity';
 import { ScheduledTransaction } from 'src/scheduled-transactions/scheduled-transactions.entity';
 import { FirebaseToken } from 'src/firebase/firebase.entity';
-import { RefreshToken } from 'src/auth/refresh-token.entity';
+import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
+import type { AuthProviders } from './users.types';
 
 @Entity("user")
 export class User {
@@ -27,6 +28,12 @@ export class User {
 
   @Column({ type: 'boolean', default: false })
   premium: boolean;
+
+  @Column({ nullable: true })
+  provider: AuthProviders
+
+  @Column({ nullable: true })
+  providerId: string
 
   @OneToMany(() => ExpenseGroup, group => group.user)
   expenseGroups: ExpenseGroup[];
