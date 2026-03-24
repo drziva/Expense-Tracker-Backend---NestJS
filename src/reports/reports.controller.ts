@@ -2,12 +2,12 @@ import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ReportsService } from './reports.service';
-import { UserId } from 'src/auth/user-id.decorator';
+import { UserId } from '../auth/user-id.decorator';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
 import { EmailReportResponse, ReportResponse } from './dto/reports-responses.dto';
-import { GetExpensesQueryDto } from 'src/expenses/dto/get-expenses-query.dto';
-import { ExpensesService } from 'src/expenses/expenses.service';
-import { IncomesService } from 'src/incomes/incomes.service';
+import { GetExpensesQueryDto } from '../expenses/dto/get-expenses-query.dto';
+import { ExpensesService } from '../expenses/expenses.service';
+import { IncomesService } from '../incomes/incomes.service';
 
 @ApiTags('Reports')
 @ApiBearerAuth()

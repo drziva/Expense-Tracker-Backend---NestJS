@@ -1,14 +1,14 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { ExpenseGroup } from './expense-groups.entity.ts';
+import { ExpenseGroup } from './expense-groups.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { GroupQueryOptions } from './expense-groups.types';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { Expense } from 'src/expenses/expenses.entity';
-import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto.js';
+import { Expense } from '../expenses/expenses.entity';
+import { ExpenseResponse } from '../expenses/dto/expenses-responses.dto.js';
 import { BudgetStatus, DeleteGroupResponse, ExpenseGroupResponse, GetGroupResponse } from './dto/expense-groups-responses.dto.js';
-import { ExpenseGroupSummary } from 'src/expense-groups/expense-groups.types.js';
+import { ExpenseGroupSummary } from './expense-groups.types.js';
 
 @Injectable()
 export class ExpenseGroupsService {

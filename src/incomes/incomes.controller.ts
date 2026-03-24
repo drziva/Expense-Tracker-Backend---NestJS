@@ -4,7 +4,7 @@ import {
 import { CreateIncomeDto } from "./dto/create-income.dto";
 import { IncomesService } from "./incomes.service";
 import { DeleteIncomeResponse, IncomeResponse, GetIncomeResponse } from "./dto/incomes-responses.dto";
-import { UserId } from "src/auth/user-id.decorator";
+import { UserId } from "../auth/user-id.decorator";
 import { UpdateIncomeDto } from "./dto/update-income.dto";
 import { 
   ApiBearerAuth, 

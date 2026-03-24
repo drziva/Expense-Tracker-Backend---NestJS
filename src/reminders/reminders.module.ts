@@ -1,13 +1,13 @@
 import { Logger, Module } from '@nestjs/common';
 import { RemindersController } from './reminders.controller';
 import { RemindersService } from './reminders.service';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Reminder } from './reminders.entity';
-import { ReportsModule } from 'src/reports/reports.module';
-import { EmailModule } from 'src/email/email.module';
+import { ReportsModule } from '../reports/reports.module';
+import { EmailModule } from '../email/email.module';
 import { RemindersScheduler } from './reminders.scheduler';
-import { FirebaseModule } from 'src/firebase/firebase.module';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
   imports: [

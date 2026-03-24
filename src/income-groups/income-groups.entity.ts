@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn } from "typeorm";
-import { User } from "src/users/user.entity";
-import { Income } from "src/incomes/incomes.entity";
-import { ScheduledTransaction } from "src/scheduled-transactions/scheduled-transactions.entity";
+import { User } from "../users/user.entity";
+import { Income } from "../incomes/incomes.entity";
+import { ScheduledTransaction } from "../scheduled-transactions/scheduled-transactions.entity";
 
 @Entity("income_groups")
 export class IncomeGroup {

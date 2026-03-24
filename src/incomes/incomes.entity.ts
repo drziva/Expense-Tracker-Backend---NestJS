@@ -7,8 +7,8 @@ import {
   CreateDateColumn,
 } from "typeorm";
 
-import { User } from "src/users/user.entity";
-import { IncomeGroup } from "src/income-groups/income-groups.entity";
+import { User } from "../users/user.entity";
+import { IncomeGroup } from "../income-groups/income-groups.entity";
 
 @Entity("incomes")
 export class Income {

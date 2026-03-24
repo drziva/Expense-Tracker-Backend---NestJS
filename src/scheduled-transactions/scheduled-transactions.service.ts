@@ -4,15 +4,15 @@ import { ScheduledTransaction } from './scheduled-transactions.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateScheduledTransactionDto } from './dto/create-scheduled-transaction.dto';
 import { TransactionEnum } from './dto/scheduled-transactions.types';
-import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
-import { IncomeGroup } from 'src/income-groups/income-groups.entity';
+import { ExpenseGroup } from '../expense-groups/expense-groups.entity';
+import { IncomeGroup } from '../income-groups/income-groups.entity';
 import { ScheduledTransactionResponse } from './dto/scheduled-transactions-responses';
 import { UpdateScheduledTransactionDto } from './dto/update-scheduled-transaction.dto';
 import { DeleteScheduledTransactionResponse } from './dto/delete-scheduled-transaction.dto';
-import { IncomesService } from 'src/incomes/incomes.service';
-import { ExpensesService } from 'src/expenses/expenses.service';
-import { Expense } from 'src/expenses/expenses.entity';
-import { Income } from 'src/incomes/incomes.entity';
+import { IncomesService } from '../incomes/incomes.service';
+import { ExpensesService } from '../expenses/expenses.service';
+import { Expense } from '../expenses/expenses.entity';
+import { Income } from '../incomes/incomes.entity';
 
 @Injectable()
 export class ScheduledTransactionsService {

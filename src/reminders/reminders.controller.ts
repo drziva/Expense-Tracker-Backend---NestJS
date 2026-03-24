@@ -14,9 +14,9 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { RemindersService } from './reminders.service';
-import { UserId } from 'src/auth/user-id.decorator';
+import { UserId } from '../auth/user-id.decorator';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
-import { PremiumGuard } from 'src/auth/guards/premium.guard';
+import { PremiumGuard } from '../auth/guards/premium.guard';
 import { ReminderResponse } from './dto/reminders-responses.dto';
 import { ReminderEnum } from './reminders-types';
 

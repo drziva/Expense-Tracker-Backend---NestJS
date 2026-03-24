@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
-import { UserId } from 'src/auth/user-id.decorator';
+import { UserId } from '../auth/user-id.decorator';
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
 import { IncomeGroupsService } from './income-groups.service';
 import { GetIncomeGroupQueryDto } from './dto/get-income-groups.dto';
@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
 import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
-import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
+import { IncomeResponse } from '../incomes/dto/incomes-responses.dto';
 import { IncomeGroupSummary } from './income-groups.types';
 import type { GetIncomeGroupSummaryDto } from './dto/income-groups-requests.dto';
 

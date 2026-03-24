@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ScheduledTransactionsService } from './scheduled-transactions.service';
-import { UserId } from 'src/auth/user-id.decorator';
-import { PremiumGuard } from 'src/auth/guards/premium.guard';
+import { UserId } from '../auth/user-id.decorator';
+import { PremiumGuard } from '../auth/guards/premium.guard';
 import { CreateScheduledTransactionDto } from './dto/create-scheduled-transaction.dto';
 import { UpdateScheduledTransactionDto } from './dto/update-scheduled-transaction.dto';
 import { ScheduledTransactionResponse } from './dto/scheduled-transactions-responses';

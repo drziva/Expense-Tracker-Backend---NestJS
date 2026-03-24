@@ -1,19 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ExpensesService } from 'src/expenses/expenses.service';
-import { IncomesService } from 'src/incomes/incomes.service';
+import { ExpensesService } from '../expenses/expenses.service';
+import { IncomesService } from '../incomes/incomes.service';
 import { GetReportQueryDto } from './dto/get-report-query.dto';
-import { ExpenseGroupsService } from 'src/expense-groups/expense-groups.service';
-import { IncomeGroupsService } from 'src/income-groups/income-groups.service';
+import { ExpenseGroupsService } from '../expense-groups/expense-groups.service';
+import { IncomeGroupsService } from '../income-groups/income-groups.service';
 import { ReportResponse } from './dto/reports-responses.dto';
 import { renderReportTemplate } from './templates/report.template';
 import * as puppeteer from "puppeteer";
-import { EmailService } from 'src/email/email.service';
-import { UsersService } from 'src/users/users.service';
+import { EmailService } from '../email/email.service';
+import { UsersService } from '../users/users.service';
 import { TransactionForReport } from './dto/transaction-for-report.dto';
 import { ReminderReport } from './reports.types';
 import { renderReminderReportTemplate } from './templates/reminder-report.template';
-import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
-import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
+import { ExpenseResponse } from '../expenses/dto/expenses-responses.dto';
+import { IncomeResponse } from '../incomes/dto/incomes-responses.dto';
 import { renderTransactionTableTemplate } from './templates/transaction-table.template';
 
 @Injectable()
