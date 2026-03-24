@@ -5,7 +5,7 @@ import { Income } from './incomes.entity';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { DeleteIncomeResponse, GetIncomeResponse, IncomeResponse } from './dto/incomes-responses.dto';
 import { IncomeQueryOptions } from './incomes.types';
-import { IncomeGroup } from 'src/income-groups/income-groups.entity';
+import { IncomeGroup } from '../income-groups/income-groups.entity';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 
 @Injectable()

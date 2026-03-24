@@ -33,7 +33,7 @@ import { FirebaseModule } from './firebase/firebase.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     ScheduleModule.forRoot(),

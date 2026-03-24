@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ExpensesService } from 'src/expenses/expenses.service';
-import { ExpenseSort } from 'src/expenses/expenses.types';
-import { IncomesService } from 'src/incomes/incomes.service';
-import { IncomeSort } from 'src/incomes/incomes.types';
+import { ExpensesService } from '../expenses/expenses.service';
+import { ExpenseSort } from '../expenses/expenses.types';
+import { IncomesService } from '../incomes/incomes.service';
+import { IncomeSort } from '../incomes/incomes.types';
 import { DashboardResponse } from './dto/dashboard-responses.dto';
-import { Income } from 'src/incomes/incomes.entity';
+import { Income } from '../incomes/incomes.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 

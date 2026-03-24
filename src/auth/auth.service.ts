@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signup.dto';
@@ -9,9 +9,9 @@ import { randomBytes } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/user.entity';
+import { User } from '../users/user.entity';
 import { GoogleAuthService } from './google/google.auth.service';
-import { AuthProviders } from 'src/users/users.types';
+import { AuthProviders } from '../users/users.types';
 import { ACCESS_TOKEN_EXPIRES_IN, REFRESH_TOKEN_COOKIE_OPTIONS } from './auth.constants';
 
 @Injectable()

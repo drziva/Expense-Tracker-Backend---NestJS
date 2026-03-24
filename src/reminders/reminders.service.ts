@@ -5,9 +5,9 @@ import { Reminder } from './reminders.entity';
 import { UpdateReminderDto } from './dto/update-reminder.dto';
 import { ReminderResponse } from './dto/reminders-responses.dto';
 import { ReminderEnum } from './reminders-types';
-import { ReportsService } from 'src/reports/reports.service';
-import { UsersService } from 'src/users/users.service';
-import { EmailService } from 'src/email/email.service';
+import { ReportsService } from '../reports/reports.service';
+import { UsersService } from '../users/users.service';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class RemindersService {

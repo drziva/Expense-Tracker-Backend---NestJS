@@ -6,11 +6,11 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from './dto/expenses-responses.dto';
 import { ExpenseQueryOptions } from './expenses.types';
-import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
-import { UsersService } from 'src/users/users.service';
-import { EmailService } from 'src/email/email.service';
-import { User } from 'src/users/user.entity';
-import { FirebaseService } from 'src/firebase/firebase.service';
+import { ExpenseGroup } from '../expense-groups/expense-groups.entity';
+import { UsersService } from '../users/users.service';
+import { EmailService } from '../email/email.service';
+import { User } from '../users/user.entity';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class ExpensesService {

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ExpenseResponse } from "src/expenses/dto/expenses-responses.dto";
-import { IncomeResponse } from "src/incomes/dto/incomes-responses.dto";
+import { ExpenseResponse } from "../../expenses/dto/expenses-responses.dto";
+import { IncomeResponse } from "../../incomes/dto/incomes-responses.dto";
 
 export class DashboardResponse {
 

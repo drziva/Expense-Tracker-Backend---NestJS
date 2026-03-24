@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { Reminder } from './reminders.entity';
 import { ReminderEnum } from './reminders-types';
 import { RemindersService } from './reminders.service';
-import { UsersService } from 'src/users/users.service';
-import { FirebaseService } from 'src/firebase/firebase.service';
+import { UsersService } from '../users/users.service';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class RemindersScheduler {

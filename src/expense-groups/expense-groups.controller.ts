@@ -1,15 +1,15 @@
 import { 
   Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query 
 } from '@nestjs/common';
-import { UserId } from 'src/auth/user-id.decorator';
+import { UserId } from '../auth/user-id.decorator';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { ExpenseGroupsService } from './expense-groups.service';
 import { GetGroupQueryDto } from './dto/get-expense-groups.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiBody, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { BudgetStatus, DeleteGroupResponse, GetGroupResponse, ExpenseGroupResponse} from './dto/expense-groups-responses.dto';
-import { ExpenseResponse } from 'src/expenses/dto/expenses-responses.dto';
-import type { GetGroupTotalDto } from 'src/expense-groups/dto/expense-groups-requests.dto';
+import { ExpenseResponse } from '../expenses/dto/expenses-responses.dto';
+import type { GetGroupTotalDto } from './dto/expense-groups-requests.dto';
 import { ExpenseGroupSummary } from './expense-groups.types';
 
 @ApiTags('Expense Groups')
