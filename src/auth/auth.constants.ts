@@ -11,4 +11,5 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS = {
     secure: false, // Set to true in production with HTTPS
     sameSite: 'lax', // Set to 'strict' in prod
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    path: '/api/auth/refresh', // Only send refresh token to this endpoint
 }

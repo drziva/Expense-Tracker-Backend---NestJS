@@ -1,0 +1,26 @@
+name: expense-tracker-ci-cd
+
+on: 
+  push: 
+    brances: 
+      - master
+
+jobs: 
+  build: 
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with: 
+          node-version: 20
+          cache: npm
+      
+      - name: install dependencies
+        run: npm ci 
+      
+      - name: lint
+        run: npm lint --if-present
+
+      - name: build project
+        run: npm run build
