@@ -19,4 +19,4 @@ jobs:
 
           script: |
             cd ~
-            ./deploy.sh
+            ./deploy-backend.sh
