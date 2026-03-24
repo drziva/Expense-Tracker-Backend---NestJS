@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'src/users/user.entity';
-import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
+import { User } from '../users/user.entity';
+import { ExpenseGroup } from '../expense-groups/expense-groups.entity';
 
 @Injectable()
 export class EmailService {

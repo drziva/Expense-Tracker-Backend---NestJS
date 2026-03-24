@@ -3,9 +3,9 @@ import { IncomesService } from './incomes.service';
 import { IncomesController } from './incomes.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Income } from './incomes.entity';
-import { IncomeGroup } from 'src/income-groups/income-groups.entity';
-import { UsersModule } from 'src/users/users.module';
-import { IncomeGroupsModule } from 'src/income-groups/income-groups.module';
+import { IncomeGroup } from '../income-groups/income-groups.entity';
+import { UsersModule } from '../users/users.module';
+import { IncomeGroupsModule } from '../income-groups/income-groups.module';
 
 @Module({
     imports: [

@@ -1,12 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
-import { Expense } from 'src/expenses/expenses.entity';
-import { Income } from 'src/incomes/incomes.entity';
-import { IncomeGroup } from 'src/income-groups/income-groups.entity';
-import { Reminder } from 'src/reminders/reminders.entity';
-import { ScheduledTransaction } from 'src/scheduled-transactions/scheduled-transactions.entity';
-import { FirebaseToken } from 'src/firebase/firebase.entity';
-import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
+import { ExpenseGroup } from '../expense-groups/expense-groups.entity';
+import { Expense } from '../expenses/expenses.entity';
+import { Income } from '../incomes/incomes.entity';
+import { IncomeGroup } from '../income-groups/income-groups.entity';
+import { Reminder } from '../reminders/reminders.entity';
+import { ScheduledTransaction } from '../scheduled-transactions/scheduled-transactions.entity';
+import { FirebaseToken } from '../firebase/firebase.entity';
+import { RefreshToken } from '../auth/entities/refresh-token.entity';
 import type { AuthProviders } from './users.types';
 
 @Entity("user")

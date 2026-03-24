@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Delete, Param, Put, Query, ParseIntPipe } 
 import { CreateExpenseDto } from "./dto/create-expense.dto";
 import { ExpensesService } from "./expenses.service";
 import { DeleteExpenseResponse, ExpenseResponse, GetExpenseResponse } from "./dto/expenses-responses.dto";
-import { UserId } from "src/auth/user-id.decorator";
+import { UserId } from "../auth/user-id.decorator";
 import { UpdateExpenseDto } from "./dto/update-expense.dto";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiOkResponse, ApiCreatedResponse } from "@nestjs/swagger";
 import { GetExpensesQueryDto } from "./dto/get-expenses-query.dto";

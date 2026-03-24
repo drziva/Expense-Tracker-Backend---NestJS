@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { DashboardService } from "./dashboard.service";
-import { UserId } from "src/auth/user-id.decorator";
+import { UserId } from "../auth/user-id.decorator";
 import { DashboardResponse } from "./dto/dashboard-responses.dto";
 
 @ApiTags("Dashboard")

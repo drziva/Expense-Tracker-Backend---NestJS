@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { TransactionEnum } from './dto/scheduled-transactions.types';
-import { User } from 'src/users/user.entity';
-import { ExpenseGroup } from 'src/expense-groups/expense-groups.entity.ts';
-import { IncomeGroup } from 'src/income-groups/income-groups.entity';
+import { User } from '../users/user.entity';
+import { ExpenseGroup } from '../expense-groups/expense-groups.entity';
+import { IncomeGroup } from '../income-groups/income-groups.entity';
 
 @Entity('scheduled_transactions')
 export class ScheduledTransaction {

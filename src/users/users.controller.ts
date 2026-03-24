@@ -2,8 +2,8 @@ import { Controller, Get, Param, ParseBoolPipe, ParseIntPipe, Put, Query, Req, U
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { UserId } from 'src/auth/user-id.decorator';
-import { PremiumGuard } from 'src/auth/guards/premium.guard';
+import { UserId } from '../auth/user-id.decorator';
+import { PremiumGuard } from '../auth/guards/premium.guard';
 
 
 @ApiBearerAuth()

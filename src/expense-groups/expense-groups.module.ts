@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ExpenseGroup } from './expense-groups.entity.ts';
+import { ExpenseGroup } from './expense-groups.entity';
 import { ExpenseGroupsController } from './expense-groups.controller';
 import { ExpenseGroupsService } from './expense-groups.service';
-import { UsersModule } from 'src/users/users.module';
-import { Expense } from 'src/expenses/expenses.entity';
+import { UsersModule } from '../users/users.module';
+import { Expense } from '../expenses/expenses.entity';
 
 @Module({
     imports:[

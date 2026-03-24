@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
-import { ExpensesModule } from 'src/expenses/expenses.module';
-import { IncomesModule } from 'src/incomes/incomes.module';
-import { Income } from 'src/incomes/incomes.entity';
-import { Expense } from 'src/expenses/expenses.entity';
+import { ExpensesModule } from '../expenses/expenses.module';
+import { IncomesModule } from '../incomes/incomes.module';
+import { Income } from '../incomes/incomes.entity';
+import { Expense } from '../expenses/expenses.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

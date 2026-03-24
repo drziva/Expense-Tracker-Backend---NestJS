@@ -5,10 +5,10 @@ import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typ
 import { CreateIncomeGroupDto } from './dto/create-income-group.dto';
 import { DeleteIncomeGroupResponse, GetIncomeGroupResponse, IncomeGroupResponse } from './dto/income-groups-responses.dto';
 import { UpdateIncomeGroupDto } from './dto/update-income-group.dto';
-import { Income } from 'src/incomes/incomes.entity';
-import { IncomeResponse } from 'src/incomes/dto/incomes-responses.dto';
+import { Income } from '../incomes/incomes.entity';
+import { IncomeResponse } from '../incomes/dto/incomes-responses.dto';
 import { IncomeGroupQueryOptions } from './income-groups.types';
-import { ExpenseGroupSummary } from 'src/expense-groups/expense-groups.types';
+import { ExpenseGroupSummary } from '../expense-groups/expense-groups.types';
 
 @Injectable()
 export class IncomeGroupsService {

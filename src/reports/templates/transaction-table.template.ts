@@ -1,5 +1,5 @@
-import { GetExpensesQueryDto } from "src/expenses/dto/get-expenses-query.dto";
-import { GetIncomesQueryDto } from "src/incomes/dto/get-incomes-query.dto";
+import { GetExpensesQueryDto } from "../../expenses/dto/get-expenses-query.dto";
+import { GetIncomesQueryDto } from "../../incomes/dto/get-incomes-query.dto";
 import { logoImageBASE64 } from "./image";
 
 export function renderTransactionTableTemplate(

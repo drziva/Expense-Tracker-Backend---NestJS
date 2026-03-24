@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Post } from "@nestjs/common";
 import { FirebaseService } from "./firebase.service";
-import { UserId } from "src/auth/user-id.decorator";
+import { UserId } from "../auth/user-id.decorator";
 
 @Controller("firebase")
 export class FirebaseController {
